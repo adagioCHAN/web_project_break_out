@@ -1,0 +1,12 @@
+/*
+  파일명: style.css
+  작성자: 정해찬
+  작성일: 2025-05-08
+  설명: 게임 웹사이트의 기본 스타일 구조
+*/
+
+body {
+  margin: 0;
+  padding: 0;
+  font-family: sans-serif;
+}
