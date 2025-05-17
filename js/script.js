@@ -1,8 +1,8 @@
 /**
  * 파일명: script.js
  * 작성자: 정해찬
- * 작성일: 2025-05-13
- * 설명: 게임 웹사이트의 기본 스크립트 구조
+ * 작성일: 2025-05-18
+ * 설명: 기능 C 구현 완료
  */
 
 const canvas = document.getElementById("gameCanvas");
@@ -102,6 +102,7 @@ const puzzleState = {
 };
 
 function handleEasyBrick(brick) {
+  const $brick = $(brick);
   const conf = stageConfig.easy;
   const index = parseInt($brick.data("piece-index"));
 
@@ -205,6 +206,7 @@ function getScoreForText(text) {
 }
 
 function handleMediumBrick(brick) {
+  const $brick = $(brick);
   const conf = stageConfig.medium;
   const type = $brick.data("piece-type");
 
@@ -250,6 +252,7 @@ function stabilizeView() {
 }
 
 function handleHardBrick(brick) {
+  const $brick = $(brick);
   const idx = parseInt($brick.data("brick-index"));
   const isConfession = $brick.data("type") === "confession";
 
@@ -262,8 +265,6 @@ function handleHardBrick(brick) {
   }else{
     $brick.remove();
     stabilizeView();
-
-    hardState.protectionBricks = hardState.protectionBricks.filter(i => i !== idx);
   }
 }
 
