@@ -126,7 +126,7 @@ function handleEasyBrick(brick) {
     if (puzzleState.board.every(Boolean)) {
       $(conf.endMessageSelector)
         .removeClass("hidden")
-        .text(conf.messaggeText);
+        .text(conf.messageText);
     }
   } else {
     resetBrick($brick);
@@ -194,7 +194,7 @@ function checkChainReaction() {
 }
 
 const mediumState = {
-  fullsentence: "",
+  fullSentence: "",
   totalScore: 0
 };
 
@@ -241,7 +241,7 @@ function startHardStageEffects() {
   $("#game-container").addClass("shacky");
 }
 
-function stablilizeView() {
+function stabilizeView() {
   hardState.intensity--;
 
   if (hardState.intensity <= 0) {
@@ -263,7 +263,7 @@ function handleHardBrick(brick) {
     $brick.remove();
     stabilizeView();
 
-    hardState.protectionBricks = hardState.protextionBricks.filter(i => i !== idx);
+    hardState.protectionBricks = hardState.protectionBricks.filter(i => i !== idx);
   }
 }
 
