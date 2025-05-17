@@ -60,11 +60,12 @@ window.addEventListener("load", resizeCanvas);
 const stageConfig = {
   easy: {
     puzzleCount: 9,
-    puzzleBoardSelector: "puzzle-board",
+    puzzleBoardSelector: "#puzzle-board",
     slotPrefix: "slot-",
     endMessageSelector: "#endMessage",
     messageText: "기억 완성!",
     resetPosition: {top: "0px", left: "0px"}
+    puzzleSize = 4;
   }
 }
 
@@ -110,6 +111,8 @@ function handleEasyBrick(brick) {
 
     $brick.remove();
 
+    checkChainReaction();
+
     if (puzzleState.board.every(Boolean)) {
       $(conf.endMessageSelector)
         .removeClass("hidden")
@@ -117,6 +120,66 @@ function handleEasyBrick(brick) {
     }
   } else {
     resetBrick($brick);
+  }
+}
+
+function checkChainReaction() {
+  const conf = stageConfig.easy;
+  const n = conf.puzzleSize;
+  const total = n*n;
+
+  const visited = Array(total).fill(false);
+  const colorMap = newArray(total);
+
+  for (i = 0; i < total; i++) {
+    const $piece = $(`#${conf.slotPrefix}${i}.fixed`);
+    colorMap[i] = $piece.length > 0 ? $piece.data("piece-color") : null;
+  }
+
+  function getAdj(index) {
+    const row = Math.floor(index / n);
+    const col = index % n;
+    const adj = [];
+
+    if (col > 0) adj.push(index - 1);
+    if (col < n - 1) adj.push(index + 1);
+    if (row > 0) adj.push(index - n);
+    if (row < n-1) adj.push(index + n);
+
+    return adj;
+  }
+
+  function bfs(start, color) {
+    const queue = [start];
+    const chain = [start];
+    visited[start] = true;
+
+    while (queue.length > 0) {
+      const current = queue.shift();
+      for (const next of getAdj(current)) {
+        if (!visited[next] && colorMap[next] === color) {
+          visited[next] = true;
+          queue.push(next);
+          chain.push(next);
+        }
+      }
+    }
+    return chain;
+  }
+
+  for (i = 0; i < total; i++) {
+    if (!visited[i] && colorMap[i]) {
+      const chain = bfs(i, colorMap[i]);
+
+      if (chain.length >= 3){
+        chain.forEach(idx => {
+          $(`#${conf.slotPrefix}${idx} .fixed`.remove();
+          puzzleState.board[idx] = null;
+        });
+
+        console.log("연쇄 반응");
+      }
+    }
   }
 }
 
