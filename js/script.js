@@ -57,13 +57,76 @@ window.addEventListener("load", resizeCanvas);
 
 
 /* === C: 스테이지별 게임 규칙 === */
+const stageConfig = {
+  easy: {
+    puzzleCount: 9,
+    puzzleBoardSelector: "puzzle-board",
+    slotPrefix: "slot-",
+    endMessageSelector: "#endMessage",
+    messageText: "기억 완성!",
+    resetPosition: {top: "0px", left: "0px"}
+  }
+}
 
+function onBrickHit(brick) {
+  switch (gameState.stage) {
+  case "easy":
+    handleEasyBrick(brick);
+    break;
+  case "medium":
+    handleMediumBrick(brick);
+    break;
+  case "hard":
+    handleHardBrick(brick);
+    break;
+  }
+}
 
+const puzzleState = {
+  board: Array(stageConfig.easy.puzzleCount).fill(null)
+};
 
+function resetBrick($brick) {
+  $brick.css({ top: pos.top, left: pos.left });
+}
 
+function handleEasyBrick(brick) {
+  const conf = stageConfig.easy;
+  const index = parseInt($brick.data("piece-index"));
 
+  if(isNaN(index) || index < 0 || index >= conf.puzzleCount) {
+    console.warn("잘못된 퍼즐 인덱스 : ", index);
+    return;
+  }
 
+  const slotSelector = `${conf.slotPrefix}${index}`;
 
+  if (!puzzleState.board[index]) {
+    puzzleState.board[index] = true
+
+    $(conf.puzzleBoardSelector)
+      .find(slotSelector)
+      .append($brick.clone().addClass("fixed"));
+
+    $brick.remove();
+
+    if (puzzleState.board.every(Boolean)) {
+      $(conf.endMessageSelector)
+        .removeClass("hidden")
+        .text(conf.messaggeText);
+    }
+  } else {
+    resetBrick($brick);
+  }
+}
+
+function handleMediumBrick(brick) {
+
+}
+
+function handleHardBrick(brick) {
+
+}
 /* === D: 디자인 및 설정 기능 === */
 
 
