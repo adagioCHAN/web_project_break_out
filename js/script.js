@@ -64,9 +64,9 @@ const stageConfig = {
     slotPrefix: "slot-",
     endMessageSelector: "#endMessage",
     messageText: "기억 완성!",
-    resetPosition: {top: "0px", left: "0px"}
-    puzzleSize: 4;
-  }
+    resetPosition: {top: "0px", left: "0px"},
+    puzzleSize: 4
+  },
   medium: {
     chatBoxSelector: "#chat-box",
     wordScores: [
@@ -230,8 +230,41 @@ function handleMediumBrick(brick) {
   $brick.remove();
 }
 
-function handleHardBrick(brick) {
+var hardState = {
+  intensity: 5,
+  confessionUnlocked: false,
+  protectionBricks: [12, 13, 14], // 보호 벽돌 관련 함수 구현 예정
+  confessionIndex: 13 // 고백 벽돌 관련 함수 구현 예정
+}
 
+function startHardStageEffects() {
+  $("#game-container").addClass("shacky");
+}
+
+function stablilizeView() {
+  hardState.intensity--;
+
+  if (hardState.intensity <= 0) {
+    $("#game-container").removeClass("shaky");
+  }
+}
+
+function handleHardBrick(brick) {
+  const idx = parseInt($brick.data("brick-index"));
+  const isConfession = $brick.data("type") === "confession";
+
+  if (isConfession) {
+    if (hardState.confessionUnlocked) {
+      console.log("고백");
+    }else {
+      console.log("실패");
+    }
+  }else{
+    $brick.remove();
+    stabilizeView();
+
+    hardState.protectionBricks = hardState.protextionBricks.filter(i => i !== idx);
+  }
 }
 
 /* === D: 디자인 및 설정 기능 === */
