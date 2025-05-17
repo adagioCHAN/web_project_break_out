@@ -67,6 +67,16 @@ const stageConfig = {
     resetPosition: {top: "0px", left: "0px"}
     puzzleSize: 4;
   }
+  medium: {
+    chatBoxSelector: "#chat-box",
+    wordScores: [
+      {text: "같이", score: 3},
+      {text: "갈래", score: 4},
+      {text: "ㅎㅎ", score: 5},
+      {text: ".", score: 2},
+      {text: "싫어", score: 0},
+    ]
+  }
 }
 
 function onBrickHit(brick) {
@@ -83,13 +93,13 @@ function onBrickHit(brick) {
   }
 }
 
-const puzzleState = {
-  board: Array(stageConfig.easy.puzzleCount).fill(null)
-};
-
 function resetBrick($brick) {
   $brick.css({ top: pos.top, left: pos.left });
 }
+
+const puzzleState = {
+  board: Array(stageConfig.easy.puzzleCount).fill(null)
+};
 
 function handleEasyBrick(brick) {
   const conf = stageConfig.easy;
@@ -183,8 +193,41 @@ function checkChainReaction() {
   }
 }
 
-function handleMediumBrick(brick) {
+const mediumState = {
+  fullsentence: "",
+  totalScore: 0
+};
 
+function getScoreForText(text) {
+  const scores = stageConfig.medium.wordScores;
+  const entry = scores.find(item => item.text === text);
+  return entry ? entry.score : 0;
+}
+
+function handleMediumBrick(brick) {
+  const conf = stageConfig.medium;
+  const type = $brick.data("piece-type");
+
+  var text = "";
+  if (type === "text") {
+    text = $brick.data("piece-text");
+    if (!text) return;
+
+    mediumState.fullSentence += text;
+  }else if (type === "tone") {
+    text = $brick.data("piece-tone");
+    if (!text) return;
+
+    mediumState.fullSentence += text;
+  }
+
+  const score = getScoreForText(text);
+
+  $(conf.chatBoxSelector).append(
+      `<div class="chat-line user">${mediumState.fullSentence} <span class="score">(+${score})</span>`
+    );
+
+  $brick.remove();
 }
 
 function handleHardBrick(brick) {
