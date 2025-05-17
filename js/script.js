@@ -65,7 +65,7 @@ const stageConfig = {
     endMessageSelector: "#endMessage",
     messageText: "기억 완성!",
     resetPosition: {top: "0px", left: "0px"}
-    puzzleSize = 4;
+    puzzleSize: 4;
   }
 }
 
@@ -129,7 +129,7 @@ function checkChainReaction() {
   const total = n*n;
 
   const visited = Array(total).fill(false);
-  const colorMap = newArray(total);
+  const colorMap = new Array(total);
 
   for (i = 0; i < total; i++) {
     const $piece = $(`#${conf.slotPrefix}${i}.fixed`);
@@ -173,7 +173,7 @@ function checkChainReaction() {
 
       if (chain.length >= 3){
         chain.forEach(idx => {
-          $(`#${conf.slotPrefix}${idx} .fixed`.remove();
+          $(`#${conf.slotPrefix}${idx} .fixed`).remove();
           puzzleState.board[idx] = null;
         });
 
@@ -190,6 +190,7 @@ function handleMediumBrick(brick) {
 function handleHardBrick(brick) {
 
 }
+
 /* === D: 디자인 및 설정 기능 === */
 
 
