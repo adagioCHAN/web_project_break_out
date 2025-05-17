@@ -1,7 +1,7 @@
 /*
   파일명: style.css
-  작성자: 정해찬
-  작성일: 2025-05-08
+  작성자: 사예원
+  작성일: 2025-05-18
   설명: 게임 웹사이트의 기본 스타일 구조
 */
 
@@ -9,4 +9,264 @@ body {
   margin: 0;
   padding: 0;
   font-family: sans-serif;
+  background-color: black;
+}
+
+#bgCanvas {
+  position: absolute;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%); 
+  margin: 20px auto 0 auto;
+  width: 960px;
+  height: 640px;
+  pointer-events: none;
+  display: none;
+  z-index: 1;
+}
+
+#start-screen{
+  width: 960px;
+  height: 640px;
+  margin: 20px auto 0 auto;
+  padding-top: 176px;
+  background-color: black;
+  cursor: url("../assets/img/cursor.png") 0 0, auto;
+}
+
+#start-btn{
+  font-family: "Poetsen One", sans-serif;
+  color: white;
+  font-size: 24px;
+  text-align: center;
+}
+
+#start-btn:hover{
+  color: #d7daf9;
+  text-decoration: underline;
+  font-size: 26px;
+}
+
+#intro-text{
+  position: relative;
+  width: 960px;
+  height: 640px;
+  line-height: 640px;
+  margin: 20px auto 0 auto;
+  color: white;
+  font-size: 2.0em;
+  text-align: center;
+  z-index: 100;
+}
+
+#intro-screen {
+  width: 960px;
+  height: 640px;
+  margin: 20px auto 0 auto;
+  background-color: black;
+  position: relative;
+  overflow: hidden;
+  z-index: 9999;
+  cursor: url("../assets/img/cursor.png") 0 0, auto;
+}
+
+.zoom-in {
+  transform: scale(10) translate(-5%, 5%);
+  opacity: 0;
+}
+
+#screen{
+  margin: 20px auto 0 auto;
+  width: 960px;
+  height: 640px;
+  background-color: black;
+  cursor: url("../assets/img/cursor.png") 0 0, auto;
+}
+
+#title{
+  width: 960px;
+  height: 80px;
+  padding-top: 40px;
+  margin-bottom: 10px;
+}
+
+#main-section{
+  width: 960px;
+  height: 300px;
+}
+
+#selection {
+  margin: 0 auto;
+  width: 200px;
+  height: 550px;
+  text-align: center;
+}
+
+.stage-btn{
+  font-family: "Poetsen One", sans-serif;
+  color: white;
+  font-size: 18px;
+  text-align: center;
+  width: 200px;
+  height: 80px;
+  line-height: 100px;
+  margin-bottom: 10px;
+  background-image: url("../assets/img/btn.png");
+  background-repeat: no-repeat;
+  background-size: contain;
+  background-position: center center;
+}
+
+.stage-btn:hover{
+  color: #d7daf9;
+  text-decoration: underline;
+  font-weight: bold;
+}
+
+.setting-btn{
+  font-family: "Poetsen One", sans-serif;
+  color: white;
+  font-size: 18px;
+  text-align: center;
+  width: 200px;
+  height: 80px;
+  line-height: 100px;
+  margin-bottom: 10px;
+  background-image: url("../assets/img/btn.png");
+  background-repeat: no-repeat;
+  background-size: contain;
+  background-position: center center;
+}
+.setting-btn:hover{
+  color: #d7daf9;
+  text-decoration: underline;
+  font-weight: bold;
+}
+
+.quit-btn{
+  font-family: "Poetsen One", sans-serif;
+  color: white;
+  font-size: 18px;
+  text-align: center;
+  width: 200px;
+  height: 80px;
+  line-height: 100px;
+  margin-bottom: 10px;
+  background-image: url("../assets/img/btn.png");
+  background-repeat: no-repeat;
+  background-size: contain;
+  background-position: center center;
+}
+
+.quit-btn:hover{
+  color: #d7daf9;
+  text-decoration: underline;
+  font-weight: bold;
+}
+
+#setting-page{
+  width: 960px;
+  height: 560px;
+  padding-top: 100px;
+  background-color: white;
+  position: relative;
+}
+
+#setting-title{
+  margin: 0 auto 30px auto;
+  width: 400px;
+  text-align: center;
+}
+
+.setting-item {
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+.group {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px; /* 화살표 사이 간격 */
+  margin-top: 10px;
+}
+
+.arrow {
+  font-size: 20px;
+  cursor: pointer;
+  user-select: none;
+  width: 30px;
+  text-align: center;
+}
+
+.current-value {
+  min-width: 60px;
+  min-height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #ccc;
+  background-color: #f9f9f9;
+  border-radius: 6px;
+  font-size: 14px;
+  font-family: 'Arial', sans-serif;
+}
+
+#back{
+  width: 150px;
+  position: absolute;
+  top: 30px;
+  right: 10px;
+  font-family: "Poetsen One", sans-serif;
+  color: black;
+  font-size: 18px;
+  text-align: center;
+  border-radius: 10px;
+}
+
+#back:hover{
+  color: #d7daf9;
+  background-color: black;
+  text-decoration: underline;
+  font-weight: bold;
+}
+
+#ending-screen {
+  position: relative;
+  width: 960px;
+  height: 640px;
+  margin: 20px auto 0 auto;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  color: white;
+  font-size: 2.0em;
+  text-align: center;
+  z-index: 100;
+}
+
+#ending-message {
+  width: 960px;
+  font-size: 24px;
+  color: white;
+  text-align: center;
+  margin-bottom: 40px;
+  z-index: 100;
+}
+
+.ending-choice {
+  width: 200px;
+  padding: 12px 24px;
+  margin: 12px auto 12px auto;
+  background: #444;
+  color: white;
+  text-align: center;
+  border-radius: 10px;
+  transition: background 0.3s;
+  font-size: 1em;
+}
+
+.ending-choice:hover {
+  background: #666;
 }

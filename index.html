@@ -1,19 +1,98 @@
 <!--
   파일명: index.html
-  작성자: 정해찬
-  작성일: 2025-05-08
-  설명: 게임 웹사이트의 기본 구조 HTML
+  작성자: 사예원
+  작성일: 2025-05-18
+  설명: 게임 웹사이트의 기본 구조 HTML(시작, 인트로, 메뉴, 게임, 엔딩 화면 구성)
 -->
 
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>team03</title>
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="css/style.css">
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Share+Tech&display=swap" rel="stylesheet">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poetsen+One&display=swap" rel="stylesheet">
 </head>
+
+
 <body>
-  <script src="script.js"></script>
+  <canvas id="bgCanvas"></canvas>
+  <div id="start-screen">
+    <img src="assets/img/title.png" id="start-image">
+    <div id="start-btn">Start</div>
+  </div>
+
+  <div id="intro-text"></div>
+
+  <div id="screen" style="display:none;">
+    <div id="title">
+      <img src="assets/img/title.png">
+    </div>
+    <div id="main-section">
+      <div id="selection">
+        <div class="stage-btn" id="easy" data-stage="EASY">Easy</div>
+        <div class="stage-btn" id="normal" data-stage="NORMAL">Normal</div>
+        <div class="stage-btn" id="hard" data-stage="HARD">Hard</div>
+        <div id="setting" class="setting-btn">환경 설정</div>
+        <div id="quit" class="quit-btn">게임 종료</div>
+      </div>
+    </div>
+
+    <div id="setting-page" style="display: none;">
+      <div id="setting-title">
+        <h2>게임 환경 설정</h2>
+      </div>
+
+      <!-- 공 설정 -->
+      <div class="setting-item" id="ball-setting">
+        <span class="label">공 이미지</span>
+        <div class="group">
+          <div class="arrow left" data-type="ball">◀</div>
+          <div class="current-value" id="ball-current">기본</div>
+          <div class="arrow right" data-type="ball">▶</div>
+        </div>
+      </div>
+
+      <!-- 배경 음악 설정 -->
+      <div class="setting-item" id="music-setting">
+        <span class="label">배경 음악</span>
+        <div class="group">
+          <div class="arrow left" data-type="music">◀</div>
+          <div class="current-value" id="music-current">기본</div>
+          <div class="arrow right" data-type="music">▶</div>
+        </div>
+      </div>
+
+      <!-- 패들 설정 -->
+      <div class="setting-item" id="paddle-setting">
+        <span class="label">패들 이미지</span>
+        <div class="group">
+          <div class="arrow left" data-type="paddle">◀</div>
+          <div class="current-value" id="paddle-current">기본</div>
+          <div class="arrow right" data-type="paddle">▶</div>
+        </div>
+      </div>
+
+      <div id="back">← 메뉴로 돌아가기</div>
+    </div>
+
+    <div id="stage-intro" style="display:none; font-size: 28px; color:white; background:black; text-align:center;"></div>
+
+    <canvas id="gameCanvas" width="960" height="640" style="display:none; background-color: lightblue;"></canvas>
+    <script src="js/script.js"></script>
+
+    <div id="ending-screen" style="display:none;">
+      <div id="ending-message">...</div>
+      <div class="ending-choice" id="goback">고백한다</div>
+      <div class="ending-choice" id="hold">참는다</div>
+    </div>
+  </div>
+
 </body>
 </html>
