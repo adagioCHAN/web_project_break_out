@@ -65,7 +65,9 @@ window.addEventListener("load", resizeCanvas);
 
 
 /* === D: 디자인 및 설정 기능 === */
-
+document.getElementById("settingButton").addEventListener("click", function() {
+  console.log("게임 설정 화면");
+});
 
 
 

@@ -59,14 +59,14 @@ html, body {
   display: none;
 }
 
-#startButton {
+/* #startButton {
   width: 100%;
   padding: 10px;
   background-color: #3b82f6;
   color: #fff;
   border: none;
   cursor: pointer;
-}
+} */
 
 /* === D: 버튼 및 사용자 설정 === */
 #startButton {
@@ -74,6 +74,24 @@ html, body {
   padding: 10px;
   background-color: #3b82f6;
   color: #fff;
-  border: none;
+  border: 1px solid black;
+  border-bottom: none;
   cursor: pointer;
+}
+#startButton:hover{
+  background-color: #fff;
+  color: #3b82f6;
+}
+
+#settingButton {
+  width: 100%;
+  padding: 10px;
+  background-color: #3b82f6;
+  color: #fff;
+  border: 1px solid black;
+  cursor: pointer;
+}
+#settingButton:hover{
+  background-color: #fff;
+  color: #3b82f6;
 }
