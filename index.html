@@ -42,16 +42,21 @@
         <div id="talk-box">
           <img id="chat-box-img" src="assets\img\kakaotalk-box.png">
           <div id="chatting">
-            <div class="message">
-<!--               <img class="player-chat-img" src="assets\img\kakaotalk-talk.png">
+<!--             <div class="message">
+              <img class="player-chat-img" src="assets\img\kakaotalk-talk.png">
               <div class="sent-content"></div>
               <img class="reply-chat-img" src="assets\img\kakaotalk-reply.png">
-              <div class="reply-line"></div> -->
-            </div>
+              <div class="reply-line"></div>
+            </div> -->
           </div>
-          <div id="chat-box"></div>
         </div>
-        <div id="emotion-graph"></div>
+        <div id="emotion-graph">
+          <video id="graph-video" muted="muted" autoplay="autoplay" loop="loop">
+            <source src="assets\video\graph-video.mp4" type="video/mp4">
+            video 태그 지원 안함
+          </video>
+          <img id="heart" src="assets\img\heart.png">
+        </div>
       </div>
 
       <!-- === B: 완료 메시지 === -->

@@ -6,7 +6,7 @@
  */
 
 const canvas = document.getElementById("gameCanvas");
-//const ctx = canvas.getContext("2d");
+const ctx = canvas.getContext("2d");
 
 let gameState = {
   stage: "easy",
@@ -146,12 +146,54 @@ function sendMessage(score) {
   }, 3000);
 }
 
-
 //아래 코드 handleMediumBrick 함수에서 brick.remove(); 위에 넣기
 // showReaction(score);
 // if (mediumState.brickCount >= 4) {
 //   sendMessage();
 // }
+
+//hard 스테이지
+//감정 그래프 및 이미지 속도 변화 함수
+//hardState.intensity 변수가 인수
+//handleHardBrick 함수 내 stabilizeView(); 코드 아래에 호출
+function updateGraphMovement(intensity) {
+  const video = document.getElementById("graph-video");
+  let rate;
+   switch(intensity) {
+   case 5: {
+    rate = 3.5;
+    break;
+   }
+   case 4: {
+    rate = 3.0;
+    break;
+   }
+   case 3: {
+    rate = 2.5;
+    break;
+   }
+   case 2: {
+    rate = 2.0;
+    break;
+   }
+   case 1: {
+    rate = 1.5;
+    break;
+   }
+   case 0: {
+    rate = 1.0;
+    break;
+   }
+   default: {
+    rate = 1.0;
+    break;
+   }
+   }
+   video.playbackRate = rate;
+   const baseDuration = 3;
+   document.getElementById("heart").style.animationDuration = `${baseDuration / (rate)}s`;
+}
+
 
 /* === C: 스테이지별 게임 규칙 === */
 
@@ -162,9 +204,6 @@ function sendMessage(score) {
 
 
 /* === D: 디자인 및 설정 기능 === */
-
-
-
 
 
 
