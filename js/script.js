@@ -38,7 +38,7 @@ window.addEventListener("load", resizeCanvas);
 /* === 공통 게임 상태 관리 === */
 const gameState = {
   stageOrder: ["easy", "medium", "hard"],
-  stage: "hard",
+  stage: "easy",
   isRunning: false,
   gameStatus: "PLAYING", // READY, PLAYING, GAME_OVER, STAGE_CLEAR, ENDING
   lives: 3,
@@ -307,16 +307,20 @@ function draw() {
     if (!draw.nextStageScheduled) {
       draw.nextStageScheduled = true;
       setTimeout(() => {
-        const currentIdx = stageOrder.indexOf(gameState.stage);
-        if (currentIdx < stageOrder.length - 1) {
-          stage = stageOrder[currentIdx + 1];
-          generateBricks(stage);
-          applyStageSettings(stage);
+        const currentIdx = gameState.stageOrder.indexOf(gameState.stage); //변수명 수정
+        if (currentIdx < gameState.stageOrder.length - 1) { //변수명 수정
+          const nextStage = gameState.stageOrder[currentIdx + 1]; //변수명 수정
+          
+          gameState.stage = nextStage; //gameState.stage를 인자로 직접 전달
+          generateBricks(gameState.stage); //위와 동일
+          applyStageSettings(gameState.stage); //위와 동일
+
           ballX = canvas.width / 2;
           ballY = canvas.height - 200;
           isDead = false;
           lives = 3;
           gameStatus = "PLAYING";
+          updateStageView(gameState.stage); //패널 업데이트 추가
           ballReadyToMove = false;
           setTimeout(() => { ballReadyToMove = true; }, 1000);
         } else {
