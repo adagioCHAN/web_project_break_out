@@ -1,8 +1,8 @@
 <!--
   파일명: index.html
-  작성자: 김나연
-  작성일: 2025-05-18
-  설명: 퍼즐판 / 채팅창 구조
+  작성자: 정해찬
+  작성일: 2025-05-24
+  설명: A, B, C 수합
 -->
 
 <!DOCTYPE html>
@@ -13,13 +13,12 @@
   <title>짝사랑 시뮬레이터</title>
   <link rel="stylesheet" href="css/style.css" />
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-  <script src="js/script.js"></script>
 </head>
 <body>
   <div id="game-container">
     
     <!-- === A: Canvas 영역 === -->
-    <canvas id="gameCanvas" width="800" height="600"></canvas>
+    <canvas id="gameCanvas" width="800" height="600" style="background-color: lightblue;"></canvas>
 
     <!-- === B: 우측 UI 패널 === -->
     <div id="uiPanel">
@@ -29,25 +28,19 @@
       <div id="uiContent">
         <div id="puzzle-board">
           <!-- 퍼즐 테두리 색상, 진행도 시각화 구현 예정 -->
-          <img id="slot-0" class="slot">
-          <img id="slot-1" class="slot">
-          <img id="slot-2" class="slot">
-          <img id="slot-3" class="slot">
-          <img id="slot-4" class="slot">
-          <img id="slot-5" class="slot">
-          <img id="slot-6" class="slot">
-          <img id="slot-7" class="slot">
-          <img id="slot-8" class="slot">
+          <img id="slot-0" class="slot" src="assets/img/gray.png" alt="">
+          <img id="slot-1" class="slot" src="assets/img/gray.png" alt="">
+          <img id="slot-2" class="slot" src="assets/img/gray.png" alt="">
+          <img id="slot-3" class="slot" src="assets/img/gray.png" alt="">
+          <img id="slot-4" class="slot" src="assets/img/gray.png" alt="">
+          <img id="slot-5" class="slot" src="assets/img/gray.png" alt="">
+          <img id="slot-6" class="slot" src="assets/img/gray.png" alt="">
+          <img id="slot-7" class="slot" src="assets/img/gray.png" alt="">
+          <img id="slot-8" class="slot" src="assets/img/gray.png" alt="">
         </div>
         <div id="talk-box">
           <img id="chat-box-img" src="assets\img\kakaotalk-box.png">
           <div id="chatting">
-<!--             <div class="message">
-              <img class="player-chat-img" src="assets\img\kakaotalk-talk.png">
-              <div class="sent-content"></div>
-              <img class="reply-chat-img" src="assets\img\kakaotalk-reply.png">
-              <div class="reply-line"></div>
-            </div> -->
           </div>
         </div>
         <div id="emotion-graph">
@@ -65,9 +58,7 @@
       <!-- === D: 시작 버튼 및 설정 === -->
       <button id="startButton">게임 시작</button>
     </div>
-
   </div>
-
+  <script src="js/script.js"></script>
 </body>
 </html>
-
