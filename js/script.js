@@ -397,7 +397,6 @@ function updateUI(stage) {
 
 //easy 스테이지
 function revealPuzzleImage(index) {
-  console.log(index);
   $(`#slot-${index}`).attr("src", `assets/img/puzzle-${index+1}.png`);
 }
 
@@ -418,9 +417,6 @@ function sendMessage(message, score) {
   if (message == "") return;
   gameState.fullSentence == "";
 
-  // chatting.querySelectorAll(".message").forEach(msg => {
-  //   msg.classList.add("slide-up");
-  // });
   $(".message").animate({bottom: "+=100px"});
 
   var container = document.createElement("div");
@@ -477,36 +473,7 @@ function updateGraphMovement(intensity) {
   else if (intensity >= -20) rate = 2.0;
   else if (intensity >= -25) rate = 1.5;
   else rate = 1.0;
-   // switch(intensity) {
-   // case 5: {
-   //  rate = 3.5;
-   //  break; 
-   // }
-   // case 4: {
-   //  rate = 3.0;
-   //  break;
-   // }
-   // case 3: {
-   //  rate = 2.5;
-   //  break;
-   // }
-   // case 2: {
-   //  rate = 2.0;
-   //  break;
-   // }
-   // case 1: {
-   //  rate = 1.5;
-   //  break;
-   // }
-   // case 0: {
-   //  rate = 1.0;
-   //  break;
-   // }
-   // default: {
-   //  rate = 1.0;
-   //  break;
-   // }
-   // }
+
    video.playbackRate = rate;
    const baseDuration = 3;
    document.getElementById("heart").style.animationDuration = `${baseDuration / (rate)}s`;
@@ -536,7 +503,6 @@ const puzzleState = {
 function handleEasyBrick(brick) {
   const conf = stageConfig.easy;
   const index = brick.index;
-  console.log(index);
 
   if(isNaN(index) || index < 0 || index >= conf.puzzleCount) {
     console.warn("잘못된 퍼즐 인덱스 : ", index);
@@ -634,23 +600,13 @@ function handleMediumBrick(brick) {
   var text = "";
   text = brick.text;
   if (!text) return;
-  console.log(text);
   //gameState.fullSentence += text;
   
   const score = getScoreForText(text);
 
   var message = `${text}(+${score})`; 
-  // $(conf.chatBoxSelector).append(
-  //     `<div class="chat-line-user">${gameState.fullSentence}<span class="score">(+${score})</span>`
-  //   );
 
   sendMessage(message, score);
-  // gameState.brickCount++;
-  // if (gameState.brickCount >= 4) {
-  //   sendMessage(score);
-  //   gameState.fullSentence = ""; //추가
-  // }
-
 }
 
 function updateCanvasShake(intensity) {
@@ -690,7 +646,6 @@ function handleHardBrick(brick) {
     gameState.intensity--;
     updateCanvasShake(gameState.intensity);
     updateGraphMovement(gameState.intensity);
-    console.log(gameState.intensity);
   }
 }
 
@@ -716,7 +671,7 @@ let timer = null
 
 document.getElementById("startButton").addEventListener("click", () => {
   gameState.isRunning = true;
-  gameState.stage = "medium";
+  gameState.stage = "easy";
   console.log("게임 시작됨. 스테이지:", gameState.stage);
 
   document.getElementById("gameCanvas").style.display = "block";
