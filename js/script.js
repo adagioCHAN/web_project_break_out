@@ -349,19 +349,49 @@ function draw() {
 /* === B: 우측 UI 출력 === */
 function updateStageView(stage) {
   //모든 보드 숨기기
-  $('#puzzle-board, #chat-box, #emotion-graph').hide();
+  $('#puzzle-board, #talk-box, #emotion-graph').hide();
+  updateUI(stage);
 
   //스테이지별로 필요한 UI만 보이기
   switch (stage) {
-    case 'easy':
+    case 'easy': {
       $('#puzzle-board').show();
       break;
-    case 'medium':
-      $('#talk-box').show();
-      break;
-    case 'hard':
+    }
+    case 'medium': {
+        $('#talk-box').show();
+            break;
+    }
+    case 'hard': {
       $('#emotion-graph').show();
       break;
+    }     
+  }
+}
+
+//게임오버되면 UI 리셋
+function updateUI(stage) {
+  switch (stage) {
+    case 'easy': {
+      for (let i=0;i<stageConfig.easy.puzzleCount;i++) {
+        $(`#slot-${i}`).attr({"src":"assets/img/gray.png"});
+        puzzleState.board[i] = null;
+      }
+      break;
+    }
+    case 'medium': {
+      var container = document.getElementById("chatting");
+      var child = container.querySelectorAll(".message");
+      for (let i=0; i<child.length; i++) {
+        container.removeChild(child[i]);
+      }
+      break;
+    }
+    case 'hard': {
+      gameState.intensity = 5;
+      updateGraphMovement(gameState.intensity);
+      break;
+    }
   }
 }
 
@@ -371,8 +401,8 @@ function revealPuzzleImage(index) {
 }
 
 const reactionMap = [
-  { min: 10, text: "😊" },
-  { min: 5, text: "😐" },
+  { min: 3, text: "😊" },
+  { min: 2, text: "😐" },
   { min: 0, text: "😢" }
 ];
 
@@ -382,46 +412,53 @@ function getReactionText(score) {
 }
 
 //메시지 출력
-function sendMessage(score) {
+function sendMessage(message, score) {
   var chatting = document.getElementById("chatting");
-  var chatLine = document.querySelector(".chat-line-user");
-  if (!chatLine) return;
+  if (message == "") return;
+  gameState.fullSentence == "";
 
-  chatting.querySelectorAll(".message").forEach(msg => {
-    msg.classList.add("slide-up");
-  });
+  $(".message").animate({bottom: "+=100px"});
 
   var container = document.createElement("div");
   container.classList.add("message", "new");
 
+  var sentContainer = document.createElement("div");
+  sentContainer.setAttribute("class", "sent");
+
   var sentDiv = document.createElement("div");
   sentDiv.setAttribute("class", "sent-content");
-  sentDiv.innerHTML = chatLine.innerHTML;
-  container.appendChild(sentDiv);
-  chatLine.remove();  // 복제 후 원본 삭제
+  sentDiv.innerHTML = message;
+  sentContainer.appendChild(sentDiv);
+  //chatLine.remove();  // 복제 후 원본 삭제
 
   var sentImg = document.createElement("img");
   sentImg.setAttribute("class", "player-chat-img");
   sentImg.setAttribute("src", "assets/img/kakaotalk-talk.png");
-  container.appendChild(sentImg);
+  sentContainer.appendChild(sentImg);
 
+  container.appendChild(sentContainer);
   chatting.appendChild(container);
+  $(sentContainer).animate({bottom: "+=50px"});
+
   setTimeout(() => {
     container.classList.remove("new");
-  }, 400);
 
-  setTimeout(() => {
+    var replyContainer = document.createElement("div");
+    replyContainer.setAttribute("class", "reply");
+
     var replyText = getReactionText(score);
     var replyDiv = document.createElement("div");
     replyDiv.setAttribute("class", "reply-line");
     replyDiv.textContent = replyText;
-    container.appendChild(replyDiv);
+    replyContainer.appendChild(replyDiv);
   
     var replyImg = document.createElement("img");
     replyImg.setAttribute("class", "reply-chat-img");
     replyImg.setAttribute("src", "assets/img/kakaotalk-reply.png");
-    container.appendChild(replyImg);
-  }, 3000);
+    replyContainer.appendChild(replyImg);
+
+    container.appendChild(replyContainer);
+  }, 400);
 }
 
 //hard 스테이지
@@ -429,41 +466,19 @@ function sendMessage(score) {
 function updateGraphMovement(intensity) {
   const video = document.getElementById("graph-video");
   let rate;
-   switch(intensity) {
-   case 5: {
-    rate = 3.5;
-    break;
-   }
-   case 4: {
-    rate = 3.0;
-    break;
-   }
-   case 3: {
-    rate = 2.5;
-    break;
-   }
-   case 2: {
-    rate = 2.0;
-    break;
-   }
-   case 1: {
-    rate = 1.5;
-    break;
-   }
-   case 0: {
-    rate = 1.0;
-    break;
-   }
-   default: {
-    rate = 1.0;
-    break;
-   }
-   }
-   video.playbackRate = rate;
-   const baseDuration = 3;
-   document.getElementById("heart").style.animationDuration = `${baseDuration / (rate)}s`;
+  if (intensity >= 0) rate = 4;
+  else if (intensity >= -5) rate = 3.5;
+  else if (intensity >= -10) rate = 3.0;
+  else if (intensity >= -15) rate = 2.5;
+  else if (intensity >= -20) rate = 2.0;
+  else if (intensity >= -25) rate = 1.5;
+  else rate = 1.0;
 
-   console.log(rate); //디버깅 코드
+  video.playbackRate = rate;
+  const baseDuration = 3;
+  document.getElementById("heart").style.animationDuration = `${baseDuration / (rate)}s`;
+
+  console.log(rate); //디버깅 코드
 }
 
 /* === C: 스테이지별 게임 규칙 === */
@@ -585,19 +600,13 @@ function handleMediumBrick(brick) {
   var text = "";
   text = brick.text;
   if (!text) return;
-  gameState.fullSentence += text;
+  //gameState.fullSentence += text;
   
   const score = getScoreForText(text);
 
-  $(conf.chatBoxSelector).append(
-      `<div class="chat-line-user">${gameState.fullSentence}<span class="score">(+${score})</span>`
-    );
+  var message = `${text}(+${score})`; 
 
-  gameState.brickCount++;
-  if (gameState.brickCount >= 4) {
-    sendMessage(score);  
-  }
-
+  sendMessage(message, score);
 }
 
 function updateCanvasShake(intensity) {
@@ -636,6 +645,7 @@ function handleHardBrick(brick) {
   }else{
     gameState.intensity--;
     updateCanvasShake(gameState.intensity);
+    updateGraphMovement(gameState.intensity);
   }
 }
 
@@ -675,6 +685,7 @@ document.getElementById("startButton").addEventListener("click", () => {
   updateStageView(gameState.stage);
 
   if (gameStatus == "GAME_OVER") {
+      updateUI(gameState.stage);
       generateBricks(gameState.stage);
       applyStageSettings(gameState.stage);
       ballX = canvas.width / 2;

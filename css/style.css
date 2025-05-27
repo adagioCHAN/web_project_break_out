@@ -66,7 +66,6 @@ html, body {
   grid-template-columns: repeat(3, 1fr);
   grid-template-rows: repeat(3, 1fr);
   gap: 5px;
-  display: none;
 }
 
 #puzzle-board img {
@@ -94,7 +93,6 @@ html, body {
   width: 280px;
   height: 495px;
   margin: 40px auto;
-  display: none;
 }
 
 #chat-box-img {
@@ -121,8 +119,8 @@ html, body {
   position: absolute;
   overflow: hidden;
   width: 280px;
-  height: 460px;
-  top: 0;
+  height: 420px;
+  top: 40px;
   right: 0;
   z-index: 2;
 }
@@ -130,13 +128,21 @@ html, body {
 .message {
   position: absolute;
   width: 280px;
+  height: 100px;
   bottom: 0;
   right: 0;
   box-sizing: border-box;
 }
 
+.sent {
+  position: absolute;
+  width: 260px;
+  height: 50px;
+  bottom: 0;
+  right: 0;
+}
+
 .player-chat-img {
-/*  display: none;*/
   position: absolute;
   width: 250px;
   height: auto;
@@ -147,11 +153,19 @@ html, body {
 
 .sent-content {
   position: absolute;
-  width: 100px;
+  width: 200px;
   height: auto;
   bottom: 10px;
   left: 40px;
   z-index: 3;
+}
+
+.reply {
+  position: absolute;
+  width: 60px;
+  height: 50px;
+  bottom: 0;
+  left: 0;
 }
 
 .reply-chat-img {
@@ -170,13 +184,6 @@ html, body {
   bottom: 10px;
   left: 20px;
   z-index: 3;
-}
-
-@keyframes slideUp {
-  to { transform: translateY(-100%); }
-}
-.message.slide-up {
-  animation: slideUp 0.5s forwards;
 }
 
 @keyframes fadeInUp {
