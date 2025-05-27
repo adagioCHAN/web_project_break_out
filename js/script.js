@@ -147,7 +147,7 @@ function getRandomInt(min, max) {
 
 function getRandomMediumText() {
   const wordList = stageConfig.medium.wordScores;
-  var randomIndex = Math.floor(Math.random() * wordList.length);
+  const randomIndex = Math.floor(Math.random() * wordList.length);
   return wordList[randomIndex].text;
 }
 
@@ -474,11 +474,11 @@ function updateGraphMovement(intensity) {
   else if (intensity >= -25) rate = 1.5;
   else rate = 1.0;
 
-   video.playbackRate = rate;
-   const baseDuration = 3;
-   document.getElementById("heart").style.animationDuration = `${baseDuration / (rate)}s`;
+  video.playbackRate = rate;
+  const baseDuration = 3;
+  document.getElementById("heart").style.animationDuration = `${baseDuration / (rate)}s`;
 
-   console.log(rate); //디버깅 코드
+  console.log(rate); //디버깅 코드
 }
 
 /* === C: 스테이지별 게임 규칙 === */
@@ -671,7 +671,6 @@ let timer = null
 
 document.getElementById("startButton").addEventListener("click", () => {
   gameState.isRunning = true;
-  gameState.stage = "easy";
   console.log("게임 시작됨. 스테이지:", gameState.stage);
 
   document.getElementById("gameCanvas").style.display = "block";
