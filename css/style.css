@@ -143,7 +143,6 @@ html, body {
 }
 
 .player-chat-img {
-/*  display: none;*/
   position: absolute;
   width: 250px;
   height: auto;
