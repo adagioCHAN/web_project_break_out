@@ -10,17 +10,15 @@ function resizeCanvas() {
   const containerWidth = container.clientWidth;
   const containerHeight = container.clientHeight;
 
-  const maxCanvasWidth = containerWidth * 0.6;
-  const maxSize = Math.min(maxCanvasWidth, containerHeight);
+  const canvasSize = Math.min(containerWidth * 0.6, containerHeight);
 
-  canvas.style.width = `${maxSize}px`;
-  canvas.style.height = `${maxSize}px`;
-  canvas.width = maxSize;
-  canvas.height = maxSize;
+  canvas.style.width = `${canvasSize}px`;
+  canvas.style.height = `${canvasSize}px`;
+  canvas.width = canvasSize;
+  canvas.height = canvasSize;
 
-  const uiWidth = containerWidth - maxSize;
-  uiPanel.style.width = `${uiWidth}px`;
-  uiPanel.style.height = `${maxSize}px`;
+  uiPanel.style.width = `${containerWidth - canvasSize}px`;
+  uiPanel.style.height = `${canvasSize}px`;
 }
 
 window.addEventListener("resize", resizeCanvas);
@@ -284,8 +282,13 @@ function update() {
 }
 
 function draw() {
+  ctx.save();
+
+  const scaleX = canvas.clientWidth / canvas.width;
+  const scaleY = canvas.clientHeight / canvas.height;
+  ctx.scale(scaleX, scaleY);
+
   ctx.clearRect(0, 0, canvas.width, canvas.height);
-  if (gameStatus == "PAUSED") return;
 
   drawBricks();
   drawBall();
@@ -340,6 +343,8 @@ function draw() {
       alert("모든 스테이지를 클리어했습니다!");
     }
   }
+
+  ctx.restore();
 }
 
 /* === B: 우측 UI 출력 === */
@@ -661,11 +666,37 @@ function handleHardBrick(brick) {
 
 
 
+/* === 전체 화면 유지 코드 === */
+function isFullScreen() {
+  return document.fullscreenElement != null
+    || document.webkitFullscreenElement != null
+    || document.mozFullScreenElement != null
+    || document.msFullscreenElement != null;
+}
+
+function requestFullScreen() {
+  const el = document.documentElement;
+  if (el.requestFullscreen) {
+    el.requestFullscreen();
+  } else if (el.webkitRequestFullscreen) {
+    el.webkitRequestFullscreen();
+  } else if (el.mozRequestFullScreen) {
+    el.mozRequestFullScreen();
+  } else if (el.msRequestFullscreen) {
+    el.msRequestFullscreen();
+  }
+}
 
 /* === (임시) 게임 시작 버튼 === */
 let timer = null
 
 document.getElementById("startButton").addEventListener("click", () => {
+  if (!isFullScreen()) {
+    alert("더 나은 게임 경험을 위해 전체화면으로 전환됩니다.");
+    requestFullScreen();
+    return;
+  }
+
   gameState.isRunning = true;
   console.log("게임 시작됨. 스테이지:", gameState.stage);
 
