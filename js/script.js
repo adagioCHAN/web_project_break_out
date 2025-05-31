@@ -10,7 +10,6 @@ function resizeCanvas() {
   const containerWidth = container.clientWidth;
   const containerHeight = container.clientHeight;
 
-  // 캔버스를 가능한 정사각형으로 만들기
   const maxCanvasWidth = containerWidth * 0.6;
   const maxSize = Math.min(maxCanvasWidth, containerHeight);
 
@@ -23,7 +22,6 @@ function resizeCanvas() {
   uiPanel.style.width = `${uiWidth}px`;
   uiPanel.style.height = `${maxSize}px`;
 }
-
 
 window.addEventListener("resize", resizeCanvas);
 window.addEventListener("load", resizeCanvas);
@@ -105,7 +103,7 @@ let bricks = [];
 
 const stageSettings = {
   EASY: {
-    rows: 3, cols: 5, width: 150, height: 50, padding: 10,
+    rows: 3, cols: 3, width: 150, height: 50, padding: 10,
     offsetX: 50, offsetY: 60, ballSpeed: 5, ballRadius: 12, paddleWidth: 120
   },
   MEDIUM: {
@@ -144,17 +142,20 @@ function getRandomMediumText() {
   return wordList[randomIndex].text;
 }
 
-function generateBricks(stage) {//벽돌 배열에 벽돌 추가
+function generateBricks(stage) {
   bricks = [];
   const s = stageSettings[stage.toUpperCase()];
   if (!s) return;
+
+  const totalWidth = s.cols * s.width + (s.cols - 1) * s.padding;
+  const offsetX = (canvas.width - totalWidth) / 2;
 
   let index = getRandomInt(0, stageConfig.easy.puzzleCount);
   let text = getRandomMediumText();
 
   for (let r = 0; r < s.rows; r++) {
     for (let c = 0; c < s.cols; c++) {
-      const x = s.offsetX + c * (s.width + s.padding);
+      const x = offsetX + c * (s.width + s.padding);
       const y = s.offsetY + r * (s.height + s.padding);
       const brick = new Brick(x, y, gameState.stage.toUpperCase(), index, text);
       brick.width = s.width;
@@ -172,6 +173,8 @@ function applyStageSettings(stage) {
   ballDY = -s.ballSpeed;
   paddleWidth = s.paddleWidth;
   paddleX = (canvas.width - paddleWidth) / 2;
+
+  paddleY = canvas.height * 0.9;
 }
 
 // 키 이벤트
