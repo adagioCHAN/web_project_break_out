@@ -1,8 +1,8 @@
 /**
  * 파일명: script.js
- * 작성자: 정해찬
- * 작성일: 2025-05-24
- * 설명: A, B, C 수합
+ * 작성자: 사예원
+ * 작성일: 2025-05-31
+ * 설명: A 파트 벽돌 배치, 패들 충돌 판정, 스페이스바 키 이벤트 수정
  */
 
 /* === 캔버스 정의 === */
@@ -112,16 +112,16 @@ let bricks = [];
 
 const stageSettings = {
   EASY: {
-    rows: 3, cols: 5, width: 150, height: 50, padding: 10,
-    offsetX: 50, offsetY: 60, ballSpeed: 5, ballRadius: 12, paddleWidth: 120
+    rows: 3, cols: 3, width: 280, height: 80, padding: 20,
+    offsetX: 20, offsetY: 60, ballSpeed: 5, ballRadius: 20, paddleWidth: 120
   },
   MEDIUM: {
-    rows: 4, cols: 6, width: 120, height: 25, padding: 8,
-    offsetX: 40, offsetY: 50, ballSpeed: 5, ballRadius: 10, paddleWidth: 120
+    rows: 3, cols: 6, width: 135, height: 60, padding: 15,
+    offsetX: 20, offsetY: 50, ballSpeed: 6, ballRadius: 20, paddleWidth: 120
   },
   HARD: {
-    rows: 5, cols: 7, width: 100, height: 20, padding: 6,
-    offsetX: 30, offsetY: 40, ballSpeed: 5, ballRadius: 8, paddleWidth: 120
+    rows: 5, cols: 5, width: 165, height: 50, padding: 15,
+    offsetX: 20, offsetY: 40, ballSpeed: 7, ballRadius: 20, paddleWidth: 120
   }
 };
 
@@ -174,17 +174,52 @@ function generateBricks(stage) {//벽돌 배열에 벽돌 추가
 function applyStageSettings(stage) {
   const s = stageSettings[gameState.stage.toUpperCase()];
   if (!s) return;
+
   ballRadius = s.ballRadius;
   ballDX = s.ballSpeed;
   ballDY = -s.ballSpeed;
   paddleWidth = s.paddleWidth;
+  
   paddleX = (canvas.width - paddleWidth) / 2;
+  paddleY = canvas.height - paddleHeight - 20;
+
+  ballX = paddleX + paddleWidth / 2;
+  ballY = paddleY - 50;
 }
 
 // 키 이벤트
+document.getElementById("startButton").addEventListener("keydown", function(e) {
+  if (e.code == "Space") {
+    e.preventDefault(); // Space 키가 버튼을 클릭하지 않도록 기본 동작 막기
+  }
+});
+
 document.addEventListener("keydown", function(e) {
   if (e.key == "ArrowLeft") leftPressed = true;
   if (e.key == "ArrowRight") rightPressed = true;
+
+  if (e.code == "Space") {
+    if (gameStatus == "GAME_OVER") {
+      score = 0;
+      lives = 3;
+      isDead = false;
+      gameStatus = "PLAYING";
+      updateUI(gameState.stage);
+      generateBricks(gameState.stage);
+      applyStageSettings(gameState.stage);
+      ballReadyToMove = false;
+      setTimeout(() => { ballReadyToMove = true; }, 1000);
+    } 
+    else if (isDead && gameStatus == "PLAYING") {
+      isDead = false;
+      ballX = paddleX + paddleWidth / 2;
+      ballY = paddleY - 50;
+      ballDX = stageSettings[gameState.stage.toUpperCase()].ballSpeed;
+      ballDY = -ballDX;
+      ballReadyToMove = false;
+      setTimeout(() => { ballReadyToMove = true; }, 1000);
+    }
+  }
 });
 
 document.addEventListener("keyup", function(e) {
@@ -208,7 +243,7 @@ function drawPaddle() {
   ctx.closePath();
 }
 
-function drawBricks() {//벽돌 출력: A파트 스테이지별 벽돌 배치 예정
+function drawBricks() {//벽돌 출력: A파트 스테이지별 벽돌 디자인 예정
   for (let i = 0; i < bricks.length; i++) {
     bricks[i].draw(ctx);
   }
@@ -280,8 +315,24 @@ function update() {
   }
 
   // 패들 충돌
-  if (ballY + ballRadius >= paddleY && ballX >= paddleX && ballX <= paddleX + paddleWidth) {
-    ballDY = -ballDY;
+ if (
+    ballY + ballRadius >= paddleY &&
+    ballY <= paddleY + paddleHeight &&
+    ballX + ballRadius >= paddleX &&
+    ballX - ballRadius <= paddleX + paddleWidth
+  ) {
+    const prevBallY = ballY - ballDY;  // 공의 이전 위치
+    const wasAbovePaddle = prevBallY + ballRadius <= paddleY;
+
+    if (wasAbovePaddle) {
+      ballDY = -ballDY;
+    } else {
+      // 옆이나 아래 -> 아래로 튕김
+      ballDX = -ballDX;
+    }
+
+    // 충돌 후 공이 패들 안쪽으로 들어가지 않도록 위치 조정
+    ballY = paddleY - ballRadius - 1;
   }
 
   collisionCheck();
