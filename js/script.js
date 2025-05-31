@@ -1,10 +1,3 @@
-/**
- * 파일명: script.js
- * 작성자: 정해찬
- * 작성일: 2025-05-24
- * 설명: A, B, C 수합
- */
-
 /* === 캔버스 정의 === */
 const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
@@ -12,25 +5,25 @@ const ctx = canvas.getContext("2d");
 function resizeCanvas() {
   const container = document.getElementById("game-container");
   const canvas = document.getElementById("gameCanvas");
+  const uiPanel = document.getElementById("uiPanel");
 
-  const maxWidth = container.clientWidth * 0.6;
-  const maxHeight = container.clientHeight;
+  const containerWidth = container.clientWidth;
+  const containerHeight = container.clientHeight;
 
-  const targetAspect = 4 / 3;
+  // 캔버스를 가능한 정사각형으로 만들기
+  const maxCanvasWidth = containerWidth * 0.6;
+  const maxSize = Math.min(maxCanvasWidth, containerHeight);
 
-  let newWidth = maxWidth;
-  let newHeight = newWidth / targetAspect;
+  canvas.style.width = `${maxSize}px`;
+  canvas.style.height = `${maxSize}px`;
+  canvas.width = maxSize;
+  canvas.height = maxSize;
 
-  if (newHeight > maxHeight) {
-    newHeight = maxHeight;
-    newWidth = newHeight * targetAspect;
-  }
-
-  canvas.style.width = `${newWidth}px`;
-  canvas.style.height = `${newHeight}px`;
-  canvas.width = newWidth;
-  canvas.height = newHeight;
+  const uiWidth = containerWidth - maxSize;
+  uiPanel.style.width = `${uiWidth}px`;
+  uiPanel.style.height = `${maxSize}px`;
 }
+
 
 window.addEventListener("resize", resizeCanvas);
 window.addEventListener("load", resizeCanvas);
