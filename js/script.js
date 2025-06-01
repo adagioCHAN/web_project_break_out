@@ -35,10 +35,10 @@ function resizeCanvas() {
 window.addEventListener("resize", resizeCanvas);
 window.addEventListener("load", resizeCanvas);
 
-/* === 공통 게임 상태 관리 === */
+/* === 공통 게임 상태 관리 === */ 
 const gameState = {
   stageOrder: ["easy", "medium", "hard"],
-  stage: "easy",
+  stage: "medium",
   isRunning: false,
   gameStatus: "PLAYING", // READY, PLAYING, GAME_OVER, STAGE_CLEAR, ENDING
   lives: 3,
@@ -662,12 +662,16 @@ document.getElementById("settingButton").addEventListener("click", function() {
 let timer = null
 
 document.getElementById("startButton").addEventListener("click", () => {
+  document.getElementById("initView").style.display = "none";
+  document.getElementById("firstStory").style.display = "flex";
+})
+
+document.getElementById("gameStart").addEventListener("click", () => {
   gameState.isRunning = true;
   console.log("게임 시작됨. 스테이지:", gameState.stage);
 
-  document.getElementById("initView").style.display = "none";
-  document.getElementById("firstStory").style.display = "flex";
-  //document.getElementById("game-container").style.display = "flex";
+  document.getElementById("select-page").style.display = "none";
+  document.getElementById("game-container").style.display = "flex";
   document.getElementById("gameCanvas").style.display = "block";
   console.log(document.getElementById("gameCanvas").width, document.getElementById("gameCanvas").height);
 
@@ -723,14 +727,6 @@ document.getElementById("return").addEventListener("click", function() {
   document.getElementById("game-setting").style.display = "none";
 });
 
-document.getElementById("stage1").addEventListener("click", () => {
-  console.log("stage1");
-});
-
-document.getElementById("stage2").addEventListener("click", () => {
-  console.log("stage2");
-});
-
-document.getElementById("stage2").addEventListener("click", () => {
-  console.log("stage2");
+document.getElementById("reload").addEventListener("click", () => {
+  location.reload();
 });
