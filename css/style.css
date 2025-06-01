@@ -12,7 +12,7 @@ html, body {
 
 #game-container {
   display: flex;
-  width: 60vw;
+  width: 80vw;
   height: 80vh;
   align-items: center;
 }

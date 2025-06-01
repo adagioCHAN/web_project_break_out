@@ -27,7 +27,7 @@ window.addEventListener("load", resizeCanvas);
 /* === 공통 게임 상태 관리 === */
 const gameState = {
   stageOrder: ["easy", "medium", "hard"],
-  stage: "easy",
+  stage:"medium",
   isRunning: false,
   gameStatus: "PLAYING", // READY, PLAYING, GAME_OVER, STAGE_CLEAR, ENDING
   lives: 3,
@@ -109,7 +109,7 @@ const stageSettings = {
     offsetX: 40, offsetY: 50, ballSpeed: 5, ballRadius: 10, paddleWidth: 120
   },
   HARD: {
-    rows: 5, cols: 7, width: 100, height: 20, padding: 6,
+    rows: 3, cols: 3, width: 100, height: 20, padding: 6,
     offsetX: 30, offsetY: 40, ballSpeed: 5, ballRadius: 8, paddleWidth: 120
   }
 };
