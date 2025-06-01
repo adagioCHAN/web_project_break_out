@@ -296,8 +296,24 @@ function update() {
   }
 
   // 패들 충돌
-  if (ballY + ballRadius >= paddleY && ballX >= paddleX && ballX <= paddleX + paddleWidth) {
-    ballDY = -ballDY;
+  if (
+    ballY + ballRadius >= paddleY &&
+    ballY <= paddleY + paddleHeight &&
+    ballX + ballRadius >= paddleX &&
+    ballX - ballRadius <= paddleX + paddleWidth
+  ) {
+    const prevBallY = ballY - ballDY;  // 공의 이전 위치
+    const wasAbovePaddle = prevBallY + ballRadius <= paddleY;
+
+    if (wasAbovePaddle) {
+      ballDY = -ballDY;
+    } else {
+      // 옆이나 아래 -> 아래로 튕김
+      ballDX = -ballDX;
+    }
+
+    // 충돌 후 공이 패들 안쪽으로 들어가지 않도록 위치 조정
+    ballY = paddleY - ballRadius - 1;
   }
 
   collisionCheck();
@@ -702,6 +718,19 @@ function requestFullScreen() {
     el.msRequestFullscreen();
   }
 }
+
+// 전체화면 종료 감지
+    document.addEventListener("fullscreenchange", () => {
+      if (!document.fullscreenElement) {
+        document.getElementById("fullscreen-exit-overlay").style.display = "flex";
+      }
+    });
+
+    // 다시 전체화면 버튼
+    function reenterFullscreen() {
+      requestFullScreen();
+      document.getElementById("fullscreen-exit-overlay").style.display = "none";
+    }
 
 let timer = null
 
