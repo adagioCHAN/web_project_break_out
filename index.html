@@ -15,6 +15,30 @@
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 </head>
 <body>
+  <div id="initView">
+    <img src="assets/img/gameStartIMG.png" id="startButton">
+    <!-- 게임 세팅 버튼 게임 시작 이후로 변경 -->
+    <!-- <img src="assets/img/GameSettingIMG.png" id="settingButton"> -->
+  </div>
+
+  <div id="firstStory">
+    <p>story</p>
+    <!-- 초기 스토리 -->
+  </div>
+
+  <div id="select-page">
+    <!-- 난이도 선택 버튼, 게임 설정 버튼 페이지 -->
+     <button id="stage1">easy</button>
+     <button id="stage2">normal</button>
+     <button id="stage3">hard</button>
+     <img src="assets/img/GameSettingIMG.png" id="settingButton">
+  </div>
+
+  <div id="game-setting">
+    <!-- game setiing 페이지 -->
+     <button id="return">돌아가기</button>
+  </div>
+
   <div id="game-container">
     
     <!-- === A: Canvas 영역 === -->
@@ -56,8 +80,8 @@
       <div id="endMessage" class="hidden">기억 완성!</div>
 
       <!-- === D: 시작 버튼 및 설정 === -->
-      <button id="startButton">게임 시작</button>
-      <button id="settingButton">게임 설정</button>
+      <!-- <button id="startButton">게임 시작</button> -->
+      <!-- <button id="settingButton">게임 설정</button> -->
     </div>
   </div>
   <script src="js/script.js"></script>

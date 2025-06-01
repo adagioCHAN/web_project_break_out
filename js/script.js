@@ -652,20 +652,10 @@ function handleHardBrick(brick) {
 /* === D: 디자인 및 설정 기능 === */
 document.getElementById("settingButton").addEventListener("click", function() {
   console.log("게임 설정 화면");
+
+  document.getElementById("select-page").style.display = "none";
+  document.getElementById("game-setting").style.display = "flex";
 });
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 /* === (임시) 게임 시작 버튼 === */
@@ -675,7 +665,11 @@ document.getElementById("startButton").addEventListener("click", () => {
   gameState.isRunning = true;
   console.log("게임 시작됨. 스테이지:", gameState.stage);
 
+  document.getElementById("initView").style.display = "none";
+  document.getElementById("firstStory").style.display = "flex";
+  //document.getElementById("game-container").style.display = "flex";
   document.getElementById("gameCanvas").style.display = "block";
+  console.log(document.getElementById("gameCanvas").width, document.getElementById("gameCanvas").height);
 
   generateBricks(gameState.stage);
   applyStageSettings(gameState.stage);
@@ -707,4 +701,36 @@ document.getElementById("startButton").addEventListener("click", () => {
       ballY = canvas.height-200;
       isDead = false;
     }
+});
+
+document.addEventListener("keydown", function(event) {
+  if(event.code == "Space") {
+    event.preventDefault();
+    
+    let firstStory = document.getElementById("firstStory");
+    let selectPage = document.getElementById("select-page");
+    
+    if(firstStory.style.display == "flex") {
+      console.log("스토리 넘김");
+      firstStory.style.display = "none";
+      selectPage.style.display = "flex";
+    }
+  }
+});
+
+document.getElementById("return").addEventListener("click", function() {
+  document.getElementById("select-page").style.display = "flex";
+  document.getElementById("game-setting").style.display = "none";
+});
+
+document.getElementById("stage1").addEventListener("click", () => {
+  console.log("stage1");
+});
+
+document.getElementById("stage2").addEventListener("click", () => {
+  console.log("stage2");
+});
+
+document.getElementById("stage2").addEventListener("click", () => {
+  console.log("stage2");
 });

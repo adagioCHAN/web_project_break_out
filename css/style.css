@@ -16,7 +16,7 @@ html, body {
 }
 
 #game-container {
-  display: flex;
+  display: none;
   width: 100%;
   height: 100%;
 }
@@ -77,15 +77,6 @@ html, body {
 
 #endMessage.hidden {
   display: none;
-}
-
-#startButton {
-  width: 100%;
-  padding: 10px;
-  background-color: #3b82f6;
-  color: #fff;
-  border: none;
-  cursor: pointer;
 }
 
 #talk-box {
@@ -254,28 +245,56 @@ canvas.shaky {
 
 /* === D: 버튼 및 사용자 설정 === */
 #startButton {
-  width: 100%;
+  width: 400px;
+  height: auto;
+  max-width: 100%;
   padding: 10px;
-  background-color: #3b82f6;
-  color: #fff;
-  border: 1px solid black;
-  border-bottom: none;
+  object-fit: contain;
+  /* background-color: #3b82f6; */
+  /* color: #fff; */
+  /* border: 1px solid black; */
+  /* border-bottom: none; */
   cursor: pointer;
 }
 #startButton:hover{
-  background-color: #fff;
-  color: #3b82f6;
+  background-color: #002d71;
+  /* color: #3b82f6; */
 }
 
 #settingButton {
-  width: 100%;
+  width: 400px;
+  height: auto;
+  max-width: 100%;
   padding: 10px;
-  background-color: #3b82f6;
-  color: #fff;
-  border: 1px solid black;
+  object-fit: contain;
+  /* background-color: #3b82f6; */
+  /* color: #fff; */
+  /* border: 1px solid black; */
   cursor: pointer;
 }
 #settingButton:hover{
-  background-color: #fff;
-  color: #3b82f6;
+  background-color: #002d71;
+  /* color: #3b82f6; */
+}
+
+#initView {
+  width: 100%;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 40px;
+  background-color: white;
+}
+
+#game-setting {
+  display: none;
+}
+
+#firstStory {
+  display: none;
+}
+
+#select-page {
+  display: none;
 }
