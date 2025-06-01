@@ -262,11 +262,12 @@ canvas.shaky {
 }
 
 #settingButton {
-  width: 400px;
+  width: 100px;
   height: auto;
   max-width: 100%;
   padding: 10px;
   object-fit: contain;
+
   /* background-color: #3b82f6; */
   /* color: #fff; */
   /* border: 1px solid black; */
@@ -275,6 +276,22 @@ canvas.shaky {
 #settingButton:hover{
   background-color: #002d71;
   /* color: #3b82f6; */
+}
+
+#stage {
+  width: 500px;
+  /* margin: 0 auto; */
+}
+
+#gameStart {
+  width: 300px;
+}
+
+#etcBtn {
+  position: fixed;   
+  bottom: 20px;      
+  right: 20px;        
+  z-index: 1000;
 }
 
 #initView {
@@ -297,4 +314,12 @@ canvas.shaky {
 
 #select-page {
   display: none;
+  width: 100%;
+  height: 100vh;
+  position: fixed;
+  background-color: white;
+
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
 }
