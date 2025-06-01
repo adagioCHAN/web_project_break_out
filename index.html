@@ -8,6 +8,31 @@
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 </head>
 <body>
+  <div id="initView">
+    <img src="assets/img/gameStartIMG.png" id="startButton">
+    <!-- 게임 세팅 버튼 게임 시작 이후로 변경 -->
+    <!-- <img src="assets/img/GameSettingIMG.png" id="settingButton"> -->
+  </div>
+
+  <div id="firstStory">
+    <p>story</p>
+    <!-- 초기 스토리 -->
+  </div>
+
+  <div id="select-page">
+    <!-- 난이도 선택 버튼, 게임 설정 버튼 페이지 -->
+     <button id="gameStart" class="stage">easy</button>
+     <button id="gameStart" class="stage">normal</button>
+     <button id="gameStart" class="stage">hard</button>
+     <img src="assets/img/GameSettingIMG.png" id="settingButton">
+     <button id="reload">새로고침</button>
+  </div>
+
+  <div id="game-setting">
+    <!-- game setiing 페이지 -->
+     <button id="return">돌아가기</button>
+  </div>
+
   <div id="game-container">
     
     <!-- === A: Canvas 영역 === -->

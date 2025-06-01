@@ -27,7 +27,7 @@ window.addEventListener("load", resizeCanvas);
 /* === 공통 게임 상태 관리 === */
 const gameState = {
   stageOrder: ["easy", "medium", "hard"],
-  stage:"medium",
+  stage:"easy",
   isRunning: false,
   gameStatus: "PLAYING", // READY, PLAYING, GAME_OVER, STAGE_CLEAR, ENDING
   lives: 3,
@@ -74,7 +74,6 @@ const stageConfig = {
     ]
   }
 }
-
 
 /* === A: 게임 엔진 & 상태 관리 === */
 // 공
@@ -179,6 +178,29 @@ function applyStageSettings(stage) {
 document.addEventListener("keydown", function(e) {
   if (e.key == "ArrowLeft") leftPressed = true;
   if (e.key == "ArrowRight") rightPressed = true;
+
+  if (e.code == "Space") {
+    if (gameStatus == "GAME_OVER") {
+      score = 0;
+      lives = 3;
+      isDead = false;
+      gameStatus = "PLAYING";
+      updateUI(gameState.stage);
+      generateBricks(gameState.stage);
+      applyStageSettings(gameState.stage);
+      ballReadyToMove = false;
+      setTimeout(() => { ballReadyToMove = true; }, 1000);
+    } 
+    else if (isDead && gameStatus == "PLAYING") {
+      isDead = false;
+      ballX = paddleX + paddleWidth / 2;
+      ballY = paddleY - 50;
+      ballDX = stageSettings[gameState.stage.toUpperCase()].ballSpeed;
+      ballDY = -ballDX;
+      ballReadyToMove = false;
+      setTimeout(() => { ballReadyToMove = true; }, 1000);
+    }
+  }
 });
 
 document.addEventListener("keyup", function(e) {
@@ -652,18 +674,12 @@ function handleHardBrick(brick) {
 
 /* === D: 디자인 및 설정 기능 === */
 
+document.getElementById("settingButton").addEventListener("click", function() {
+  console.log("게임 설정 화면");
 
-
-
-
-
-
-
-
-
-
-
-
+  document.getElementById("select-page").style.display = "none";
+  document.getElementById("game-setting").style.display = "flex";
+});
 
 
 /* === 전체 화면 유지 코드 === */
@@ -687,7 +703,6 @@ function requestFullScreen() {
   }
 }
 
-/* === (임시) 게임 시작 버튼 === */
 let timer = null
 
 document.getElementById("startButton").addEventListener("click", () => {
@@ -696,11 +711,38 @@ document.getElementById("startButton").addEventListener("click", () => {
     requestFullScreen();
     return;
   }
+  document.getElementById("initView").style.display = "none";
+  document.getElementById("firstStory").style.display = "flex";
+});
 
+$("#select-page").find(".stage").eq(0).on("click", function() {
+  mainGame(0);
+});
+$("#select-page").find(".stage").eq(1).on("click", function() {
+  mainGame(1);
+});
+$("#select-page").find(".stage").eq(2).on("click", function() {
+  mainGame(2);
+});
+
+function mainGame(handler){
+  alert(handler);
+  switch(handler){
+  case 0: gameState.stage = "easy"; break;
+  case 1: gameState.stage = "medium"; break;
+  case 2: gameState.stage = "hard"; break;
+  }
   gameState.isRunning = true;
   console.log("게임 시작됨. 스테이지:", gameState.stage);
 
+  document.getElementById("select-page").style.display = "none";
+  document.getElementById("game-container").style.display = "flex";
   document.getElementById("gameCanvas").style.display = "block";
+  document.getElementById("uiPanel").style.display = "block";
+
+  console.log(document.getElementById("gameCanvas").width, document.getElementById("gameCanvas").height);
+ 
+  resizeCanvas();
 
   generateBricks(gameState.stage);
   applyStageSettings(gameState.stage);
@@ -732,4 +774,28 @@ document.getElementById("startButton").addEventListener("click", () => {
       ballY = canvas.height-200;
       isDead = false;
     }
+};
+
+document.addEventListener("keydown", function(event) {
+  if(event.code == "Tab") {
+    event.preventDefault();
+    
+    let firstStory = document.getElementById("firstStory");
+    let selectPage = document.getElementById("select-page");
+    
+    if(firstStory.style.display == "flex") {
+      console.log("스토리 넘김");
+      firstStory.style.display = "none";
+      selectPage.style.display = "flex";
+    }
+  }
+});
+
+document.getElementById("return").addEventListener("click", function() {
+  document.getElementById("select-page").style.display = "flex";
+  document.getElementById("game-setting").style.display = "none";
+});
+
+document.getElementById("reload").addEventListener("click", () => {
+  location.reload();
 });
