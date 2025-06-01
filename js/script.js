@@ -726,7 +726,6 @@ $("#select-page").find(".stage").eq(2).on("click", function() {
 });
 
 function mainGame(handler){
-  alert(handler);
   switch(handler){
   case 0: gameState.stage = "easy"; break;
   case 1: gameState.stage = "medium"; break;
@@ -753,6 +752,8 @@ function mainGame(handler){
 
   updateStageView(gameState.stage);
 
+  $("#homeButton").on("click",function() {goHome();});
+
   if (gameStatus == "GAME_OVER") {
       updateUI(gameState.stage);
       generateBricks(gameState.stage);
@@ -775,6 +776,15 @@ function mainGame(handler){
       isDead = false;
     }
 };
+
+  function goHome(){
+    document.getElementById("select-page").style.display = "flex";
+    document.getElementById("game-container").style.display = "none";
+    document.getElementById("gameCanvas").style.display = "none";
+    document.getElementById("uiPanel").style.display = "none";
+
+    /*설정 초기화*/
+  }
 
 document.addEventListener("keydown", function(event) {
   if(event.code == "Tab") {
