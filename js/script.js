@@ -140,6 +140,10 @@ function Brick(x, y, type, index, text) {//벽돌 정의: D파트 디자인 추�
   this.type = type;
   this.index = index; // easy 모드에서 사용할 벽돌 index
   this.text = text; // medium 모드에서 사용할 벽돌 text (stageConfig.medium.wordScores로 초기화)
+
+  this.isConfession = false; // hard 모드에서 사용할 고백 벽돌
+  this.isLocked = false;
+
   this.draw = function(ctx) {
     if (!this.alive) return;
     ctx.fillStyle = "black";
@@ -165,17 +169,44 @@ function generateBricks(stage) {
   const totalWidth = s.cols * s.width + (s.cols - 1) * s.padding;
   const offsetX = (canvas.width - totalWidth) / 2;
 
-  let index = getRandomInt(0, stageConfig.easy.puzzleCount);
-  let text = getRandomMediumText();
+  if (stage.toUpperCase() == "HARD") { // hard 모드 벽돌 생성(고백/보호 벽돌)
+    const confessionRow = 2;
+    const confessionCol = 2;
 
-  for (let r = 0; r < s.rows; r++) {
-    for (let c = 0; c < s.cols; c++) {
-      const x = offsetX + c * (s.width + s.padding);
-      const y = s.offsetY + r * (s.height + s.padding);
-      const brick = new Brick(x, y, gameState.stage.toUpperCase(), index, text);
-      brick.width = s.width;
-      brick.height = s.height;
-      bricks.push(brick);
+    for (let r = 0; r < s.rows; r++) {
+      for (let c = 0; c < s.cols; c++) {
+        const x = c * (s.width + s.padding);
+        const y = s.offsetY + r * (s.height + s.padding);
+        const index = r * s.cols + c;
+        const brick = new Brick(x, y, stage.toUpperCase(), index, null);
+        brick.width = s.width;
+        brick.height = s.height;
+
+        if (r == confessionRow && c == confessionCol) {
+          brick.isConfession = true;
+          brick.isLocked = true;
+        }
+
+        bricks.push(brick);
+      }
+    }
+  }
+  else{
+    const totalWidth = s.cols * s.width + (s.cols - 1) * s.padding;
+    const offsetX = 0;
+
+    let index = getRandomInt(0, stageConfig.easy.puzzleCount);
+    let text = getRandomMediumText();
+
+    for (let r = 0; r < s.rows; r++) {
+      for (let c = 0; c < s.cols; c++) {
+        const x = offsetX + c * (s.width + s.padding);
+        const y = s.offsetY + r * (s.height + s.padding);
+        const brick = new Brick(x, y, gameState.stage.toUpperCase(), index, text);
+        brick.width = s.width;
+        brick.height = s.height;
+        bricks.push(brick);
+      }
     }
   }
 }
@@ -206,6 +237,8 @@ document.addEventListener("keydown", function(e) {
       updateUI(gameState.stage);
       generateBricks(gameState.stage);
       applyStageSettings(gameState.stage);
+      ballX = canvas.width / 2;
+      ballY = canvas.height - 200;
       ballReadyToMove = false;
       setTimeout(() => { ballReadyToMove = true; }, 1000);
     } 
@@ -232,11 +265,32 @@ document.addEventListener("keydown", function(e) {
       selectPage.style.display = "flex";
     }
   }
+
+  // 방향키 모드
+  if (keySetting == 1) {
+    if (e.key == "ArrowLeft") leftPressed = true;
+    if (e.key == "ArrowRight") rightPressed = true;
+  }
+
+  // WASD 모드
+  else if (keySetting == 2) {
+    if (e.key == "a" || e.key == "A") leftPressed = true;
+    if (e.key == "d" || e.key == "D") rightPressed = true;
+  }
 });
 
 document.addEventListener("keyup", function(e) {
-  if (e.key == "ArrowLeft") leftPressed = false;
-  if (e.key == "ArrowRight") rightPressed = false;
+  const keySetting = settingContainerState.keySetting.current;
+
+  if (keySetting == 1) {
+    if (e.key == "ArrowLeft") leftPressed = false;
+    if (e.key == "ArrowRight") rightPressed = false;
+  }
+
+  else if (keySetting === 2) {
+    if (e.key == "a" || e.key == "A") leftPressed = false;
+    if (e.key == "d" || e.key == "D") rightPressed = false;
+  }
 });
 
 function drawBall() {
@@ -447,6 +501,7 @@ function updateUI(stage) {
         $(`#slot-${i}`).attr({"src":"assets/img/gray.png"});
         puzzleState.board[i] = null;
       }
+      canvas.classList.remove("shaky");
       break;
     }
     case 'medium': {
@@ -454,6 +509,7 @@ function updateUI(stage) {
       var child = container.querySelectorAll(".message");
       for (let i=0; i<child.length; i++) {
         container.removeChild(child[i]);
+        canvas.classList.remove("shaky");
       }
       break;
     }
@@ -702,17 +758,61 @@ function updateCanvasShake(intensity) {
   }
 }
 
+function getConfessionNeighbors(index) {
+  const cols = 5;
+  const row = Math.floor(index / cols);
+  const col = index % cols;
+
+  const neighbors = [];
+
+  const directions = [
+    [-1, 0], [1, 0], [0, -1], [0, 1],     // 상하좌우
+    [-1, -1], [-1, 1], [1, -1], [1, 1]    // 대각선
+  ];
+
+  for (let [dr, dc] of directions) {
+    const r = row + dr;
+    const c = col + dc;
+    if (r >= 0 && r < 5 && c >= 0 && c < 5) {
+      neighbors.push(r * cols + c);
+    }
+  }
+
+  return neighbors;
+}
+
+// 보호 벽돌 제거 확인 함수
+function areProtectionBricksCleared(confessionIndex) {
+  const neighbors = getConfessionNeighbors(confessionIndex);
+  for (let i of neighbors) {
+    if (bricks[i] && bricks[i].alive) {
+      return false;
+    }
+  }
+  return true;
+}
+
 function handleHardBrick(brick) {
   const idx = parseInt(brick.index);
-  const isConfession = brick.type === "confession";
-
-  if (isConfession) {
-    if (gameState.confessionUnlocked) {
-      console.log("고백");
-    }else {
-      console.log("실패");
+  
+  if (brick.isConfession) {
+    if (brick.isLocked) {
+      const unlocked = areProtectionBricksCleared(idx);
+      if (unlocked) {
+        // 보호 벽돌 제거됨 → 잠금 해제
+        brick.isLocked = false;
+        console.log("고백 벽돌 잠금 해제");
+      } else {
+        // 잠금 상태 → 실패 처리
+        console.log("일찍 고백 -> 실패");
+        gameStatus = "GAME_OVER";
+      }
+    } else {
+      // 잠금이 해제된 상태 → 고백 성공
+      gameStatus = "STAGE_CLEAR";
     }
-  }else{
+  } else {
+    // 일반 벽돌 처리
     gameState.intensity--;
     updateCanvasShake(gameState.intensity);
     updateGraphMovement(gameState.intensity);
