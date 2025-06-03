@@ -65,6 +65,18 @@ const gameState = {
   confessionIndex: 13 // 고백 벽돌 관련 함수 구현 예정
 }
 
+const fixedColors = [
+  "#FF0000", // 빨강
+  "#00FF00", // 초록
+  "#0000FF", // 파랑
+  "#FFFF00", // 노랑
+  "#FF00FF", // 자홍
+  "#00FFFF", // 청록
+  "#FFA500", // 주황
+  "#800080", // 보라
+  "#808000"  // 올리브
+];
+
 // 게임 상태
 let isDead = false;
 let ballReadyToMove = false;
@@ -141,12 +153,14 @@ function Brick(x, y, type, index, text) {//벽돌 정의: D파트 디자인 추�
   this.index = index; // easy 모드에서 사용할 벽돌 index
   this.text = text; // medium 모드에서 사용할 벽돌 text (stageConfig.medium.wordScores로 초기화)
 
+  this.color = fixedColors[this.index];
+
   this.isConfession = false; // hard 모드에서 사용할 고백 벽돌
   this.isLocked = false;
 
   this.draw = function(ctx) {
     if (!this.alive) return;
-    ctx.fillStyle = "black";
+    ctx.fillStyle = this.color || "black";
     ctx.fillRect(this.x, this.y, this.width, this.height);
   };
 }
@@ -195,14 +209,11 @@ function generateBricks(stage) {
     const totalWidth = s.cols * s.width + (s.cols - 1) * s.padding;
     const offsetX = 0;
 
-    let index = getRandomInt(0, stageConfig.easy.puzzleCount);
-    let text = getRandomMediumText();
-
     for (let r = 0; r < s.rows; r++) {
       for (let c = 0; c < s.cols; c++) {
         const x = offsetX + c * (s.width + s.padding);
         const y = s.offsetY + r * (s.height + s.padding);
-        const brick = new Brick(x, y, gameState.stage.toUpperCase(), index, text);
+        const brick = new Brick(x, y, gameState.stage.toUpperCase(), getRandomInt(0, stageConfig.easy.puzzleCount-1), getRandomMediumText());
         brick.width = s.width;
         brick.height = s.height;
         bricks.push(brick);
@@ -641,7 +652,7 @@ function handleEasyBrick(brick) {
     puzzleState.board[index] = true
 
     revealPuzzleImage(index);
-    checkChainReaction();
+    checkChainReaction(index);
 
     if (puzzleState.board.every(Boolean)) {
       $("#puzzle-board").css("gap", "0px");
@@ -651,66 +662,6 @@ function handleEasyBrick(brick) {
     }
   } else {
     console.log("예외");
-  }
-}
-
-function checkChainReaction() {
-  const conf = stageConfig.easy;
-  const n = conf.puzzleSize;
-  const total = n*n;
-
-  const visited = Array(total).fill(false);
-  const colorMap = new Array(total);
-
-  for (i = 0; i < total; i++) {
-    const $piece = $(`#${conf.slotPrefix}${i}.fixed`);
-    colorMap[i] = $piece.length > 0 ? $piece.data("piece-color") : null;
-  }
-
-  function getAdj(index) {
-    const row = Math.floor(index / n);
-    const col = index % n;
-    const adj = [];
-
-    if (col > 0) adj.push(index - 1);
-    if (col < n - 1) adj.push(index + 1);
-    if (row > 0) adj.push(index - n);
-    if (row < n-1) adj.push(index + n);
-
-    return adj;
-  }
-
-  function bfs(start, color) {
-    const queue = [start];
-    const chain = [start];
-    visited[start] = true;
-
-    while (queue.length > 0) {
-      const current = queue.shift();
-      for (const next of getAdj(current)) {
-        if (!visited[next] && colorMap[next] === color) {
-          visited[next] = true;
-          queue.push(next);
-          chain.push(next);
-        }
-      }
-    }
-    return chain;
-  }
-
-  for (i = 0; i < total; i++) {
-    if (!visited[i] && colorMap[i]) {
-      const chain = bfs(i, colorMap[i]);
-
-      if (chain.length >= 3){
-        chain.forEach(idx => {
-          $(`#${conf.slotPrefix}${idx} .fixed`).remove();
-          puzzleState.board[idx] = null;
-        });
-
-        console.log("연쇄 반응");
-      }
-    }
   }
 }
 
@@ -865,16 +816,22 @@ function reenterFullscreen() {
 
 let timer = null
 
+function loop(){
+  draw();
+  requestAnimationFrame(loop);
+}
+
 document.getElementById("startButton").addEventListener("click", () => {
   if (!isFullScreen()) {
     alert("더 나은 게임 경험을 위해 전체화면으로 전환됩니다.");
     requestFullScreen();
     return;
   }
+  loop();
+
   document.getElementById("initView").style.display = "none";
   document.getElementById("firstStory").style.display = "flex";
 });
-
 $("#select-page").find(".stage").eq(0).on("click", function() {
   mainGame(0);
 });
@@ -907,8 +864,6 @@ function mainGame(handler){
   applyStageSettings(gameState.stage);
   ballReadyToMove = false;
   setTimeout(() => { ballReadyToMove = true; }, 1000);
-  if(timer) clearInterval(timer);
-  timer = setInterval(draw, 16);
 
   updateStageView(gameState.stage);
 
