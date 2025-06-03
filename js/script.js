@@ -22,7 +22,25 @@ function resizeCanvas() {
 }
 
 window.addEventListener("resize", resizeCanvas);
-window.addEventListener("load", resizeCanvas);
+window.addEventListener("load", () => {
+  resizeCanvas();
+  
+  const bgm = document.getElementById("bgm");
+  var temp = 0;
+  if (temp == 0) {
+    document.body.addEventListener("click", () => {
+      bgm.muted = false;
+      bgm.play()
+      .then(() => {
+        console.log("bgm 재생")
+      })
+      .catch(error => {
+        console.log("bgm 재생 안됨: ", error)
+      });
+    }, {once: true});
+  temp++;
+  }
+});
 
 /* === 공통 게임 상태 관리 === */
 const gameState = {
@@ -199,6 +217,19 @@ document.addEventListener("keydown", function(e) {
       ballDY = -ballDX;
       ballReadyToMove = false;
       setTimeout(() => { ballReadyToMove = true; }, 1000);
+    }
+  }
+
+  if(event.code == "Tab") {
+    event.preventDefault();
+    
+    let firstStory = document.getElementById("firstStory");
+    let selectPage = document.getElementById("select-page");
+    
+    if(firstStory.style.display == "flex") {
+      console.log("스토리 넘김");
+      firstStory.style.display = "none";
+      selectPage.style.display = "flex";
     }
   }
 });
@@ -720,17 +751,17 @@ function requestFullScreen() {
 }
 
 // 전체화면 종료 감지
-    document.addEventListener("fullscreenchange", () => {
-      if (!document.fullscreenElement) {
-        document.getElementById("fullscreen-exit-overlay").style.display = "flex";
-      }
-    });
+document.addEventListener("fullscreenchange", () => {
+  if (!document.fullscreenElement) {
+      document.getElementById("fullscreen-exit-overlay").style.display = "flex";
+  }
+});
 
-    // 다시 전체화면 버튼
-    function reenterFullscreen() {
-      requestFullScreen();
-      document.getElementById("fullscreen-exit-overlay").style.display = "none";
-    }
+// 다시 전체화면 버튼
+function reenterFullscreen() {
+  requestFullScreen();
+  document.getElementById("fullscreen-exit-overlay").style.display = "none";
+}
 
 let timer = null
 
@@ -781,8 +812,6 @@ function mainGame(handler){
 
   updateStageView(gameState.stage);
 
-  $("#homeButton").on("click",function() {goHome();});
-
   if (gameStatus == "GAME_OVER") {
       updateUI(gameState.stage);
       generateBricks(gameState.stage);
@@ -806,34 +835,90 @@ function mainGame(handler){
     }
 };
 
-  function goHome(){
-    document.getElementById("select-page").style.display = "flex";
-    document.getElementById("game-container").style.display = "none";
-    document.getElementById("gameCanvas").style.display = "none";
-    document.getElementById("uiPanel").style.display = "none";
-
-    /*설정 초기화*/
-  }
-
-document.addEventListener("keydown", function(event) {
-  if(event.code == "Tab") {
-    event.preventDefault();
-    
-    let firstStory = document.getElementById("firstStory");
-    let selectPage = document.getElementById("select-page");
-    
-    if(firstStory.style.display == "flex") {
-      console.log("스토리 넘김");
-      firstStory.style.display = "none";
-      selectPage.style.display = "flex";
-    }
-  }
+$(document).on("click", ".homeButton", function() {
+  console.log("홈 버튼 클릭됨");
+  goHome();
 });
+
+function goHome(){
+  document.getElementById("select-page").style.display = "flex";
+  document.getElementById("game-container").style.display = "none";
+  document.getElementById("gameCanvas").style.display = "none";
+  document.getElementById("uiPanel").style.display = "none";
+  document.getElementById("game-setting").style.display = "none";
+
+  /*설정 초기화*/
+}
 
 document.getElementById("return").addEventListener("click", function() {
   document.getElementById("select-page").style.display = "flex";
   document.getElementById("game-setting").style.display = "none";
 });
+
+const settingContainerState = {
+  ballImage: {current: 1, max: 4, prefix: 'blockImage'},
+  blockImage: {current: 1, max: 4, prefix: 'blockImage'},
+  bgImage: {current: 1, max: 4, prefix: 'blockImage'},
+  bgmImage: {current: 1, max: 4, prefix: 'bgmImg'},
+  musicSetting: {current: 1, max: 2, prefix: 'musicSetting'},
+  keySetting: {current: 1, max: 2, prefix: 'keySetting'},
+}
+
+function onArrowClick(event) {
+  const clicked = event.target;
+  if ((!clicked.classList.contains) && (!clicked.classList.contains)) return;
+
+  const containerDiv = clicked.closest('.settingContainer');
+  if (!containerDiv) return;
+
+  const cid = containerDiv.id;
+  if (!settingContainerState[cid]) return;
+
+  const state = settingContainerState[cid];
+  const isLeft = clicked.classList.contains("leftArrow");
+  const isRight = clicked.classList.contains("rightArrow");
+
+  if (isRight) {
+    state.current++;
+    if (state.current > state.max) state.current = 1;
+  }
+  else if (isLeft) {
+    state.current--;
+    if (state.current < 1) state.current = state.max;
+  }
+
+  const changeImg = containerDiv.querySelector(".mainImage");
+  changeImg.src = `assets/img/${state.prefix}${state.current}.png`;
+
+  if (cid == "bgmImage" || cid == "musicSetting") {
+    musicControl(cid, state.current);
+  }
+}
+
+document.querySelectorAll(".settingContainer").forEach(div => {
+  div.addEventListener("click", onArrowClick);
+});
+
+function musicControl(cid, cur) {
+  const music = document.getElementById("bgm");
+  if (cid == "bgmImage") {
+    console.log(cur);
+    switch(cur) {
+      case 1: music.src = "assets/audio/bgm1.mp3"; break;
+      case 2: music.src = "assets/audio/bgm2.mp3"; break;
+      case 3: music.src = "assets/audio/bgm3.mp3"; break;
+      case 4: music.src = "assets/audio/bgm4.mp3"; break;
+      default: music.src = "assets/audio/bgm1.mp3"; break;
+    }
+  }
+  else if (cid == "musicSetting") {
+    switch(cur) {
+      case 1: music.muted = false; break;
+      case 2: music.muted = true; break;
+    }
+    console.log("setting changed");
+  }
+}
 
 document.getElementById("reload").addEventListener("click", () => {
   location.reload();
