@@ -1,3 +1,10 @@
+/**
+ * 파일명: script.js
+ * 작성자: 사예원
+ * 작성일: 2025-06-03
+ * 설명: 하드 모드 기능 추가, 난이도 선택 시 상태 초기화
+ */
+
 /* === 캔버스 정의 === */
 const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
@@ -150,6 +157,65 @@ function Brick(x, y, type, index, text) {//벽돌 정의: D파트 디자인 추�
   };
 }
 
+// 키 이벤트
+document.addEventListener("keydown", function(e) {
+  const keySetting = settingContainerState.keySetting.current;
+
+  // 스토리 넘김 키 여기 이벤트리스너에 넣음
+  if(e.code == "Tab") {
+    e.preventDefault();
+
+    let firstStory = document.getElementById("firstStory");
+    let selectPage = document.getElementById("select-page");
+
+    if(firstStory.style.display == "flex") {
+      console.log("스토리 넘김");
+      firstStory.style.display = "none";
+      selectPage.style.display = "flex";
+    }
+  }
+
+  // 방향키 모드
+  if (keySetting == 1) {
+    if (e.key == "ArrowLeft") leftPressed = true;
+    if (e.key == "ArrowRight") rightPressed = true;
+  }
+
+  // WASD 모드
+  else if (keySetting == 2) {
+    if (e.key == "a" || e.key == "A") leftPressed = true;
+    if (e.key == "d" || e.key == "D") rightPressed = true;
+  }
+
+  // 공 시작 또는 재시작
+  if (e.code == "Space") {
+    if (gameStatus == "GAME_OVER") {
+      score = 0;
+      lives = 3;
+      isDead = false;
+      gameStatus = "PLAYING";
+      updateUI(gameState.stage);
+      generateBricks(gameState.stage);
+      applyStageSettings(gameState.stage);
+
+      ballX = canvas.width / 2;
+      ballY = canvas.height - 200;
+
+      ballReadyToMove = false;
+      setTimeout(() => { ballReadyToMove = true; }, 1000);
+    } 
+    else if (isDead && gameStatus == "PLAYING") {
+      isDead = false;
+      ballX = paddleX + paddleWidth / 2;
+      ballY = paddleY - 50;
+      ballDX = stageSettings[gameState.stage.toUpperCase()].ballSpeed;
+      ballDY = -ballDX;
+      ballReadyToMove = false;
+      setTimeout(() => { ballReadyToMove = true; }, 1000);
+    }
+  }
+});
+
 function getRandomInt(min, max) {
   return Math.floor(Math.random() * (max - min + 1)) + min;
 }
@@ -219,65 +285,6 @@ function applyStageSettings(stage) {
 
   paddleY = canvas.height * 0.9;
 }
-
-// 키 이벤트
-document.addEventListener("keydown", function(e) {
-  const keySetting = settingContainerState.keySetting.current;
-
-  // 스토리 넘김 키 여기 이벤트리스너에 넣음
-  if(e.code == "Tab") {
-    e.preventDefault();
-
-    let firstStory = document.getElementById("firstStory");
-    let selectPage = document.getElementById("select-page");
-
-    if(firstStory.style.display == "flex") {
-      console.log("스토리 넘김");
-      firstStory.style.display = "none";
-      selectPage.style.display = "flex";
-    }
-  }
-
-  // 방향키 모드
-  if (keySetting == 1) {
-    if (e.key == "ArrowLeft") leftPressed = true;
-    if (e.key == "ArrowRight") rightPressed = true;
-  }
-
-  // WASD 모드
-  else if (keySetting == 2) {
-    if (e.key == "a" || e.key == "A") leftPressed = true;
-    if (e.key == "d" || e.key == "D") rightPressed = true;
-  }
-
-  // 공 시작 또는 재시작
-  if (e.code == "Space") {
-    if (gameStatus == "GAME_OVER") {
-      score = 0;
-      lives = 3;
-      isDead = false;
-      gameStatus = "PLAYING";
-      updateUI(gameState.stage);
-      generateBricks(gameState.stage);
-      applyStageSettings(gameState.stage);
-
-      ballX = canvas.width / 2;
-      ballY = canvas.height - 200;
-
-      ballReadyToMove = false;
-      setTimeout(() => { ballReadyToMove = true; }, 1000);
-    } 
-    else if (isDead && gameStatus == "PLAYING") {
-      isDead = false;
-      ballX = paddleX + paddleWidth / 2;
-      ballY = paddleY - 50;
-      ballDX = stageSettings[gameState.stage.toUpperCase()].ballSpeed;
-      ballDY = -ballDX;
-      ballReadyToMove = false;
-      setTimeout(() => { ballReadyToMove = true; }, 1000);
-    }
-  }
-});
 
 document.addEventListener("keyup", function(e) {
   const keySetting = settingContainerState.keySetting.current;
