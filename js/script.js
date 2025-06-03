@@ -100,8 +100,8 @@ let bricks = [];
 
 const stageSettings = {
   EASY: {
-    rows: 3, cols: 3, width: 150, height: 50, padding: 10,
-    offsetX: 50, offsetY: 60, ballSpeed: 5, ballRadius: 12, paddleWidth: 120
+    rows: 12, cols: 12, width: canvas.width / 12, height: canvas.height / 36, padding: 0,
+    offsetX: 0, offsetY: 0, ballSpeed: 5, ballRadius: 12, paddleWidth: 120
   },
   MEDIUM: {
     rows: 4, cols: 6, width: 120, height: 25, padding: 8,
