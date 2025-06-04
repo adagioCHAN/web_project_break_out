@@ -185,6 +185,15 @@ function Brick(x, y, type, index, text) {//벽돌 정의: D파트 디자인 추�
     if (!this.alive) return;
     ctx.fillStyle = this.color || "black";
     ctx.fillRect(this.x, this.y, this.width, this.height);
+
+    ctx.strokeStyle = "white";
+    ctx.lineWidth = 2;
+    ctx.strokeRect(
+      this.x + 1, 
+      this.y + 1, 
+      this.width - 2, 
+      this.height - 2
+    );
   };
 }
 
@@ -821,7 +830,17 @@ function requestFullScreen() {
 // 전체화면 종료 감지
 document.addEventListener("fullscreenchange", () => {
   if (!document.fullscreenElement) {
-      document.getElementById("fullscreen-exit-overlay").style.display = "flex";
+    const modal = document.getElementById("fullscreen-modal");
+    const okBtn = document.getElementById("modal-ok");
+
+    modal.classList.remove("hidden");
+
+    okBtn.onclick = () => {
+      modal.classList.add("hidden");
+      requestFullScreen();
+    };
+
+    return;
   }
 });
 
@@ -838,10 +857,18 @@ function loop(){
   requestAnimationFrame(loop);
 }
 
-document.getElementById("startButton").addEventListener("click", () => {
+document.getElementById("start-btn").addEventListener("click", () => {
   if (!isFullScreen()) {
-    alert("더 나은 게임 경험을 위해 전체화면으로 전환됩니다.");
-    requestFullScreen();
+    const modal = document.getElementById("fullscreen-modal");
+    const okBtn = document.getElementById("modal-ok");
+
+    modal.classList.remove("hidden");
+
+    okBtn.onclick = () => {
+      modal.classList.add("hidden");
+      requestFullScreen();
+    };
+
     return;
   }
   loop();

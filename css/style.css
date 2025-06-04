@@ -1,8 +1,14 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
 html, body {
   margin: 0;
   padding: 0;
   height: 100%;
-  background-color: #f0f0f0;
+  background: linear-gradient(to bottom, #FFE4F0, white);
 
   display: flex;
   justify-content: center;
@@ -26,30 +32,36 @@ html, body {
 /* === B: UI 패널 - 우측 (40%) === */
 #uiPanel {
   display: none;
+  height: 100%;
   background-color: white;
   box-sizing: border-box;
   overflow: hidden;
+  position: relative;
 }
 
 #stageTitle {
   font-weight: bold;
   margin-bottom: 15px;
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  z-index: 999;
 }
 
 #uiContent {
+  display: flex;
+  justify-content: center;      /* 가로 중앙 */
+  align-items: center;  
+  height: 100%;  
   flex-grow: 1;
-  background-color: #eee;
   border: 1px solid #ccc;
-  margin-bottom: 10px;
   overflow-y: auto;
 }
 
 #puzzle-board {
   display: grid;
-  width: 262px;
-  height: 262px;
-  margin: 50px auto;
-  padding: 5px;
+  width: 80%;                   /* 또는 max-width: 300px */
+  aspect-ratio: 1 / 1;  
   background-color: #ddd;
   border: 1px solid #ccc;
   grid-template-columns: repeat(3, 1fr);
@@ -242,33 +254,6 @@ canvas.shaky {
 }
 
 /* === D: 버튼 및 사용자 설정 === */
-#startButton {
-  width: 100%;
-  padding: 10px;
-  background-color: #3b82f6;
-  color: #fff;
-  border: none;
-  cursor: pointer;
-}
-
-#startButton {
-  width: 400px;
-  height: auto;
-  max-width: 100%;
-  padding: 10px;
-  object-fit: contain;
-  /* background-color: #3b82f6; */
-  /* color: #fff; */
-  /* border: 1px solid black; */
-  /* border-bottom: none; */
-  cursor: pointer;
-}
-
-#startButton:hover{
-  background-color: #002d71;
-  /* color: #3b82f6; */
-}
-
 #settingButton {
   width: 400px;
   height: auto;
@@ -290,30 +275,8 @@ canvas.shaky {
   /* color: #3b82f6; */
 }
 
-#initView {
-  width: 100%;
-  height: 100vh;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 40px;
-  background-color: white;
-}
-
 #firstStory {
   display: none;
-}
-
-#select-page {
-  display: none;
-  width: 100%;
-  height: 100vh;
-  position: fixed;
-  background-color: white;
-
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
 }
 
 #fullscreen-exit-overlay {
@@ -415,11 +378,6 @@ canvas.shaky {
   font-size: 20px;
 }
 
-#stage {
-  width: 500px;
-  /* margin: 0 auto; */
-}
-
 #gameStart {
   width: 300px;
 }
@@ -431,7 +389,7 @@ canvas.shaky {
   z-index: 1000;
 }
 
-#game-setting {Add commentMore actions
+#game-setting {
   display: none;
   text-align: center;
   overflow: scroll;
@@ -514,4 +472,208 @@ canvas.shaky {
   margin: 20px;
   font-size: 20px;
   background-color: white;
+}
+
+#start-btn {
+  background-color: #FFD6EA;
+  color: #fff;
+  font-size: 50px;
+  padding: 16px 40px;
+  border: 4px solid white;
+  border-radius: 50px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  text-shadow:
+    0 2px 4px rgba(255, 105, 180, 1),      /* 선명한 진핑크 기본 그림자 */
+    0 0 6px rgba(255, 105, 180, 0.6),      /* 주변 퍼짐 효과 */
+    1px 1px 0 rgba(255, 64, 129, 0.8);     /* 입체감 */
+  font-family: "Nanum Pen Script", cursive;
+  cursor: pointer;
+  transition: 0.3s ease;
+}
+
+#start-btn:hover {
+  background-color: #FBCFE8;
+  transform: scale(1.05);
+}
+
+.main-title {
+  font-size: 50px;
+  color: #C45C9B;
+  text-align: center;
+  margin-bottom: 20px;
+  font-family: "Gamja Flower", sans-serif;
+}
+
+#initView {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(255, 192, 203, 0.3);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+}
+
+.modal.hidden {
+  display: none;
+}
+
+.modal-box {
+  background: #FFF0F5;
+  border-radius: 20px;
+  padding: 24px 32px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+  text-align: center;
+  animation: fadeIn 0.4s ease;
+}
+
+.modal-title {
+  font-family: 'Gamja Flower', cursive;
+  font-size: 22px;
+  color: #C45C9B;
+  margin-bottom: 12px;
+}
+
+.modal-body {
+  font-family: 'Gowun Dodum', sans-serif;
+  font-size: 16px;
+  margin-bottom: 20px;
+}
+
+.modal-btn {
+  background: #FFB7CE;
+  color: white;
+  padding: 10px 24px;
+  border: none;
+  border-radius: 30px;
+  font-size: 16px;
+  cursor: pointer;
+  box-shadow: 0 4px 8px rgba(255, 105, 180, 0.3);
+}
+
+#reload {
+  margin-top: 30px;
+  background: none;
+  border: none;
+  color: #888;
+  font-size: 16px;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+#settingButton {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: #FFE8F1;
+  border: none;
+  border-radius: 50%;
+  width: 48px;
+  height: 48px;
+  font-size: 22px;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+#settingButton:hover {
+  background: #FFD6EA;
+  transform: rotate(20deg);
+}
+
+#select-page {
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+
+  width: 90vw;
+  height: 85vh;
+  background-color: white;
+  border-radius: 32px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  z-index: 100;
+  padding: 50px 30px;
+  box-sizing: border-box;
+}
+
+#stage {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+.difficulty-title {
+  font-family: 'Gamja Flower', cursive;
+  font-size: 38px;
+  color: #C45C9B;
+  margin-bottom: 50px;
+  text-align: center;
+}
+
+.stage {
+  width: 300px;
+  padding: 20px;
+  margin: 16px 0;
+  font-size: 22px;
+  font-family: 'Gowun Dodum', sans-serif;
+  border: none;
+  border-radius: 18px;
+  cursor: pointer;
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.08);
+  transition: 0.2s ease;
+}
+
+.stage:nth-child(2) { background: #FFE8F1; color: #C45C9B; }
+.stage:nth-child(3) { background: #D6F0FF; color: #4279B3; }
+.stage:nth-child(4) { background: #E6D6FA; color: #5E3793; }
+
+.stage:hover {
+  transform: scale(1.06);
+}
+
+#reload {
+  margin-top: 40px;
+  font-size: 18px;
+  color: #666;
+  background: none;
+  border: none;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+#settingButton {
+  position: absolute;
+  top: 24px;
+  right: 24px;
+
+  width: 72px;
+  height: 72px;
+  background: none;
+  border: none;
+  font-size: 40px;
+  cursor: pointer;
+  color: #A98ECF;
+  transition: transform 0.3s ease;
+}
+
+#settingButton:hover {
+  transform: rotate(25deg) scale(1.1);
 }
