@@ -528,7 +528,12 @@ function updateUI(stage) {
   switch (stage) {
     case 'easy': {
       for (let i=0;i<stageConfig.easy.puzzleCount;i++) {
-        $(`#slot-${i}`).attr({"src":"assets/img/gray.png"});
+        $(`#slot-${i}`)
+        .attr({"src":"assets/img/gray.png"})
+        .css({
+          "border": "2px solid" + fixedColors[i],     // 원하는 색상/두께
+          "box-sizing": "border-box"       // 이미지 크기 유지
+        });
         puzzleState.board[i] = null;
       }
       canvas.classList.remove("shaky");
@@ -922,11 +927,6 @@ function goHome(){
 
   /*설정 초기화*/
 }
-
-document.getElementById("return").addEventListener("click", function() {
-  document.getElementById("select-page").style.display = "flex";
-  document.getElementById("game-setting").style.display = "none";
-});
 
 const settingContainerState = {
   ballImage: {current: 1, max: 4, prefix: 'blockImage'},
