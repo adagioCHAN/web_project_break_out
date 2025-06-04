@@ -8,6 +8,8 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Gamja+Flower&family=Nanum+Pen+Script&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Gamja+Flower&family=Gowun+Dodum&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Gamja+Flower&display=swap" rel="stylesheet">
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 </head>
 <body>
@@ -32,37 +34,49 @@
   </div>
 
   <div id="game-setting">
-    <button class="homeButton">홈🏠</button>
-    <!-- game setiing 페이지 -->
-    <h1>게임설정</h1>
-     <div id = "bgImage" class="settingContainer">
-        <h3>배경 사진</h3>
-      <img class="leftArrow" src="assets/img/leftArrow.png">
-      <img id="bgImg" class="mainImage" src="assets/img/blockImage1.png">
-      <img class="rightArrow" src="assets/img/rightArrow.png">
-     </div>
+    <button class="homeButton">↩︎</button>
+    <h3>게임설정</h3>
 
-     <div id = "bgmImage" class="settingContainer">
-       <h3>배경 음악</h3>
-      <img class="leftArrow" src="assets/img/leftArrow.png">
-      <img id="bgmImg" class="mainImage" src="assets/img/bgmImg1.png">
-      <img class="rightArrow" src="assets/img/rightArrow.png">
-     </div>
+    <div class="girdWrapper">
+      <div class="settingGrid">
+       <div id = "bgThema" class="settingContainer">
+          <h3>배경 스타일</h3>
+          <div class="settingContent">
+            <img class="leftArrow" src="assets/img/leftArrow.png">
+            <div id="bgImgCircle" class="colorCircle"></div>
+            <img class="rightArrow" src="assets/img/rightArrow.png">
+          </div>
+       </div>
 
-     <div id = "musicSetting" class="settingContainer">
-      <h3>음악 소리 켜기/끄기</h3>
-      <img class="leftArrow" src="assets/img/leftArrow.png">
-      <img id="musicSettingImg" class="mainImage" src="assets/img/musicSetting1.png">
-      <img class="rightArrow" src="assets/img/rightArrow.png">
-     </div>
+       <div id = "bgmImage" class="settingContainer">
+         <h3>배경 음악</h3>
+         <div class="settingContent">
+          <img class="leftArrow" src="assets/img/leftArrow.png">
+          <img id="bgmImg" class="mainImage" src="assets/img/bgmImg1.png">
+          <img class="rightArrow" src="assets/img/rightArrow.png">
+        </div>
+       </div>
 
-     <div id="keySetting" class="settingContainer" >
-      <h3>플레이어 키 설정</h3>
-      <img class="leftArrow" src="assets/img/leftArrow.png">
-      <img id="keySettingImg" class="mainImage" src="assets/img/keySetting1.png">
-       <img class="rightArrow" src="assets/img/rightArrow.png">
-      </div>
-  </div>
+       <div id = "musicSetting" class="settingContainer">
+        <h3>음악 소리 켜기/끄기</h3>
+        <div class="settingContent">
+          <img class="leftArrow" src="assets/img/leftArrow.png">
+          <img id="musicSettingImg" class="mainImage" src="assets/img/musicSetting1.png">
+          <img class="rightArrow" src="assets/img/rightArrow.png">
+        </div>
+       </div>
+
+       <div id="keySetting" class="settingContainer" >
+        <h3>플레이어 키 설정</h3>'
+        <div class="settingContent">
+          <img class="leftArrow" src="assets/img/leftArrow.png">
+          <img id="keySettingImg" class="mainImage" src="assets/img/keySetting1.png">
+          <img class="rightArrow" src="assets/img/rightArrow.png">
+        </div>
+       </div>
+     </div>
+   </div>
+ </div>
 
   <div id="firstStory">
     <p>story</p>

@@ -80,6 +80,20 @@ const fixedColors = [
   "#E4EABF"  // 파스텔 올리브 (자연, 안정)
 ];
 
+const bgColors = [
+  "linear-gradient(to bottom, #FFE4F0, white)",
+  "linear-gradient(to bottom, #FFF0E6, #FFFCEE)",
+  "linear-gradient(to bottom, #E0F7FA, #FFF)",
+  "linear-gradient(to bottom, #FDE2FF, #FFF5E6)"
+];
+
+const bgThemaColors = [
+  "#FFE4F0",
+  "#FFF0E6",
+  "#E0F7FA",
+  "#FDE2FF"
+];
+
 const MAXEASY = 150;
 const MAXMEDIUM = 300;
 const MAXHARD = 500;
@@ -950,7 +964,7 @@ function goHome(){
 }
 
 const settingContainerState = {
-  bgImage: {current: 1, max: 4, prefix: 'blockImage'},
+  bgThema: { current: 1, max: 4, prefix: 'bgthema' },
   bgmImage: {current: 1, max: 4, prefix: 'bgmImg'},
   musicSetting: {current: 1, max: 2, prefix: 'musicSetting'},
   keySetting: {current: 1, max: 2, prefix: 'keySetting'},
@@ -979,8 +993,23 @@ function onArrowClick(event) {
     if (state.current < 1) state.current = state.max;
   }
 
-  const changeImg = containerDiv.querySelector(".mainImage");
-  changeImg.src = `assets/img/${state.prefix}${state.current}.png`;
+  if (cid === "bgThema") {
+    const newColor = bgColors[state.current - 1];
+    const newThemaColor = bgThemaColors[state.current - 1];
+
+    document.body.style.background = newColor;
+    document.documentElement.style.background = newColor;
+
+    const circle = containerDiv.querySelector("#bgImgCircle");
+    if (circle) {
+      circle.style.backgroundColor = newThemaColor;
+    }
+  } else {
+    const changeImg = containerDiv.querySelector(".mainImage");
+    if (changeImg) {
+      changeImg.src = `assets/img/${state.prefix}${state.current}.png`;
+    }
+  }
 
   if (cid == "bgmImage" || cid == "musicSetting") {
     musicControl(cid, state.current);
