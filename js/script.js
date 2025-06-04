@@ -68,17 +68,21 @@ const gameState = {
   confessionIndex: 13 // 고백 벽돌 관련 함수 구현 예정
 }
 
-const fixedColors = [
-  "#FF0000", // 빨강
-  "#00FF00", // 초록
-  "#0000FF", // 파랑
-  "#FFFF00", // 노랑
-  "#FF00FF", // 자홍
-  "#00FFFF", // 청록
-  "#FFA500", // 주황
-  "#800080", // 보라
-  "#808000"  // 올리브
+const fixedColors = [ 
+  "#FFB3BA", // 파스텔 레드 (로맨틱 핑크빛)
+  "#B5EAD7", // 파스텔 민트 (포근한 초록)
+  "#AEC6FF", // 파스텔 블루 (맑고 부드러운 하늘)
+  "#FFFACD", // 파스텔 노랑 (연노랑, 희망)
+  "#F3C6E0", // 파스텔 자홍 (사랑, 로맨스)
+  "#CFF5F2", // 파스텔 청록 (상쾌한 감정)
+  "#FFD8A8", // 파스텔 오렌지 (따뜻함, 설렘)
+  "#D7B2FF", // 파스텔 보라 (감성, 신비로움)
+  "#E4EABF"  // 파스텔 올리브 (자연, 안정)
 ];
+
+const MAXEASY = 150;
+const MAXMEDIUM = 300;
+const MAXHARD = 500;
 
 // 게임 상태
 let isDead = false;
@@ -919,8 +923,6 @@ function goHome(){
 }
 
 const settingContainerState = {
-  ballImage: {current: 1, max: 4, prefix: 'blockImage'},
-  blockImage: {current: 1, max: 4, prefix: 'blockImage'},
   bgImage: {current: 1, max: 4, prefix: 'blockImage'},
   bgmImage: {current: 1, max: 4, prefix: 'bgmImg'},
   musicSetting: {current: 1, max: 2, prefix: 'musicSetting'},
