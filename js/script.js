@@ -255,8 +255,8 @@ function applyStageSettings(stage) {
 
 // 키 이벤트
 document.addEventListener("keydown", function(e) {
-  if (e.key == "ArrowLeft") leftPressed = true;
-  if (e.key == "ArrowRight") rightPressed = true;
+  const keySetting = settingContainerState.keySetting.current;
+  console.log(keySetting);
 
   if (e.code == "Space") {
     if (gameStatus == "GAME_OVER") {
@@ -348,16 +348,6 @@ function drawBricks() {//벽돌 출력: A파트 스테이지별 벽돌 배치 �
 function drawUI() {
   ctx.fillStyle = "#222";
   ctx.font = "16px 'Share Tech'";
-  ctx.fillText("Score: " + score, 20, 30);
-  ctx.fillText("Lives: " + lives, canvas.width - 100, 30);
-
-  if (isDead && lives > 0) {
-    ctx.fillStyle = "#000";
-    ctx.font = "32px 'Share Tech'";
-    ctx.textAlign = "center";
-    ctx.fillText("out", canvas.width / 2, canvas.height / 2);
-    ctx.textAlign = "start";
-  }
 }
 
 function collisionCheck() {
@@ -799,7 +789,7 @@ document.getElementById("settingButton").addEventListener("click", function() {
   console.log("게임 설정 화면");
 
   document.getElementById("select-page").style.display = "none";
-  document.getElementById("game-setting").style.display = "flex";
+  document.getElementById("game-setting").style.display = "block";
 });
 
 
