@@ -17,6 +17,9 @@ function resizeCanvas() {
   canvas.width = canvasSize;
   canvas.height = canvasSize;
 
+  stageSettings.EASY.width = canvas.width / stageSettings.EASY.cols;
+  stageSettings.EASY.height = canvas.height / (stageSettings.EASY.rows + 6);
+
   uiPanel.style.width = `${containerWidth - canvasSize}px`;
   uiPanel.style.height = `${canvasSize}px`;
 }
@@ -130,8 +133,8 @@ let bricks = [];
 
 const stageSettings = {
   EASY: {
-    rows: 12, cols: 12, width: canvas.width / 12, height: canvas.height / 36, padding: 0,
-    offsetX: 0, offsetY: 0, ballSpeed: 5, ballRadius: 12, paddleWidth: 120
+    rows: 6, cols: 6, width: canvas.width / 6, height: canvas.height / 18, padding: 0,
+    offsetX: 0, offsetY: 0, ballSpeed: 5, ballRadius: 4, paddleWidth: 120
   },
   MEDIUM: {
     rows: 4, cols: 6, width: 120, height: 25, padding: 8,
@@ -146,8 +149,24 @@ const stageSettings = {
 function Brick(x, y, type, index, text) {//벽돌 정의: D파트 디자인 추가 예
   this.x = x;
   this.y = y;
-  this.width = 150;
-  this.height = 30;
+  switch(gameState.stage){
+  case "easy": {
+    this.width = stageSettings.EASY.width;
+    this.height = stageSettings.EASY.height;
+    break;
+  }
+  case "medium":{
+    this.width = stageSettings.MEDIUM.width;
+    this.height = stageSettings.MEDIUM.height;
+    break;
+  }
+  case "hard":{
+    this.width = stageSettings.HARD.width;
+    this.height = stageSettings.HARD.height;
+    break;
+  }
+  }
+
   this.alive = true;
   this.type = type;
   this.index = index; // easy 모드에서 사용할 벽돌 index
@@ -652,7 +671,6 @@ function handleEasyBrick(brick) {
     puzzleState.board[index] = true
 
     revealPuzzleImage(index);
-    checkChainReaction(index);
 
     if (puzzleState.board.every(Boolean)) {
       $("#puzzle-board").css("gap", "0px");
