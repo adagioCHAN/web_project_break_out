@@ -25,7 +25,7 @@ html, body {
 /* === A: 캔버스 영역 - 좌측 (60%) === */
 #gameCanvas {
   display: none;
-  background-color: lightblue;
+  background-color: white;
   flex-shrink: 0;
 }
 

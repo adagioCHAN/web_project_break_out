@@ -20,6 +20,12 @@ function resizeCanvas() {
   stageSettings.EASY.width = canvas.width / stageSettings.EASY.cols;
   stageSettings.EASY.height = canvas.height / (stageSettings.EASY.rows + 6);
 
+  stageSettings.MEDIUM.width = canvas.width / stageSettings.MEDIUM.cols;
+  stageSettings.MEDIUM.height = canvas.height / (stageSettings.MEDIUM.rows + 6);
+
+  stageSettings.HARD.width = canvas.width / stageSettings.HARD.cols;
+  stageSettings.HARD.height = canvas.height / (stageSettings.HARD.rows + 6);
+
   uiPanel.style.width = `${containerWidth - canvasSize}px`;
   uiPanel.style.height = `${canvasSize}px`;
 }
@@ -94,6 +100,8 @@ const bgThemaColors = [
   "#FDE2FF"
 ];
 
+//점수 상수
+const BASICSCORE = 100;
 const MAXEASY = 150;
 const MAXMEDIUM = 300;
 const MAXHARD = 500;
@@ -152,15 +160,15 @@ let bricks = [];
 const stageSettings = {
   EASY: {
     rows: 6, cols: 6, width: canvas.width / 6, height: canvas.height / 18, padding: 0,
-    offsetX: 0, offsetY: 0, ballSpeed: 5, ballRadius: 4, paddleWidth: 120
+    offsetX: 0, offsetY: 0, ballSpeed: 5, ballRadius: 10, paddleWidth: 120
   },
   MEDIUM: {
-    rows: 4, cols: 6, width: 120, height: 25, padding: 8,
-    offsetX: 40, offsetY: 50, ballSpeed: 5, ballRadius: 10, paddleWidth: 120
+    rows: 6, cols: 6, width: canvas.width / 6, height: canvas.height / 18, padding: 0,
+    offsetX: 0, offsetY: 0, ballSpeed: 5, ballRadius: 10, paddleWidth: 120
   },
   HARD: {
-    rows: 3, cols: 3, width: 100, height: 20, padding: 6,
-    offsetX: 30, offsetY: 40, ballSpeed: 5, ballRadius: 8, paddleWidth: 120
+    rows: 6, cols: 6, width: canvas.width / 6, height: canvas.height / 18, padding: 0,
+    offsetX: 0, offsetY: 0, ballSpeed: 5, ballRadius: 10, paddleWidth: 120
   }
 };
 
@@ -171,16 +179,58 @@ function Brick(x, y, type, index, text) {//벽돌 정의: D파트 디자인 추�
   case "easy": {
     this.width = stageSettings.EASY.width;
     this.height = stageSettings.EASY.height;
+    this.draw = function(ctx) {
+      if (!this.alive) return;
+      ctx.fillStyle = this.color || "black";
+      ctx.fillRect(this.x, this.y, this.width, this.height);
+
+      ctx.strokeStyle = "white";
+      ctx.lineWidth = 2;
+      ctx.strokeRect(
+        this.x + 1, 
+        this.y + 1, 
+        this.width - 2, 
+        this.height - 2
+      );
+    };
     break;
   }
   case "medium":{
     this.width = stageSettings.MEDIUM.width;
     this.height = stageSettings.MEDIUM.height;
+    this.draw = function(ctx) {
+      if (!this.alive) return;
+      ctx.fillStyle = "white";
+      ctx.fillRect(this.x, this.y, this.width, this.height);
+
+      ctx.strokeStyle = "black";
+      ctx.lineWidth = 2;
+      ctx.strokeRect(
+        this.x + 1, 
+        this.y + 1, 
+        this.width - 2, 
+        this.height - 2
+      );
+    };
     break;
   }
   case "hard":{
     this.width = stageSettings.HARD.width;
     this.height = stageSettings.HARD.height;
+    this.draw = function(ctx) {
+      if (!this.alive) return;
+      ctx.fillStyle = "white";
+      ctx.fillRect(this.x, this.y, this.width, this.height);
+
+      ctx.strokeStyle = "black";
+      ctx.lineWidth = 2;
+      ctx.strokeRect(
+        this.x + 1, 
+        this.y + 1, 
+        this.width - 2, 
+        this.height - 2
+      );
+    };
     break;
   }
   }
@@ -194,21 +244,6 @@ function Brick(x, y, type, index, text) {//벽돌 정의: D파트 디자인 추�
 
   this.isConfession = false; // hard 모드에서 사용할 고백 벽돌
   this.isLocked = false;
-
-  this.draw = function(ctx) {
-    if (!this.alive) return;
-    ctx.fillStyle = this.color || "black";
-    ctx.fillRect(this.x, this.y, this.width, this.height);
-
-    ctx.strokeStyle = "white";
-    ctx.lineWidth = 2;
-    ctx.strokeRect(
-      this.x + 1, 
-      this.y + 1, 
-      this.width - 2, 
-      this.height - 2
-    );
-  };
 }
 
 function getRandomInt(min, max) {
@@ -373,7 +408,7 @@ function drawBricks() {//벽돌 출력: A파트 스테이지별 벽돌 배치 �
 }
 
 function drawUI() {
-  ctx.fillStyle = "#222";
+  ctx.fillStyle = "white";
   ctx.font = "16px 'Share Tech'";
 }
 
