@@ -103,10 +103,15 @@
 
     <!-- === B: 우측 UI 패널 === -->
     <div id="uiPanel">
-      <div id="stageTitle"><button class="homeButton">홈🏠</button></div>
+      <div id="stageTitle"><button class="homeButton">↩︎</button></div>
 
       <!-- === B: UI 콘텐츠 (퍼즐판, 채팅창, 그래프 등) === -->
       <div id="uiContent">
+        <div id="scorePanel">
+          <div id="scoreInfo">호감도: <span id="scoreValue">0</span></div>
+          <img id="characterImg" src="assets/img/char_1.png" alt="캐릭터" />
+        </div>
+
         <div id="puzzle-board">
           <!-- 퍼즐 테두리 색상, 진행도 시각화 구현 예정 -->
           <img id="slot-0" class="slot" src="assets/img/gray.png" alt="">

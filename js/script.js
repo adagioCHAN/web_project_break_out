@@ -58,12 +58,10 @@ const gameState = {
   isRunning: false,
   gameStatus: "PLAYING", // READY, PLAYING, GAME_OVER, STAGE_CLEAR, ENDING
   lives: 3,
-  score: 0,
   isDead: false,
   ballReadyToMove: false,
 
   fullSentence: "",
-  totalScore: 0,
   brickCount: 0,
   messageCount: 0,
 
@@ -100,6 +98,12 @@ const bgThemaColors = [
   "#FDE2FF"
 ];
 
+const charGroup = [
+  "assets/img/char_1.png",
+  "assets/img/char_2.png",
+  "assets/img/char_3.png"
+]
+
 //점수 상수
 const BASICSCORE = 100;
 const MAXEASY = 150;
@@ -109,7 +113,7 @@ const MAXHARD = 500;
 // 게임 상태
 let isDead = false;
 let ballReadyToMove = false;
-let score = 0;
+let score = BASICSCORE;
 let lives = 3;
 let gameStatus = "PLAYING"; 
 
@@ -244,6 +248,17 @@ function Brick(x, y, type, index, text) {//벽돌 정의: D파트 디자인 추�
 
   this.isConfession = false; // hard 모드에서 사용할 고백 벽돌
   this.isLocked = false;
+}
+
+function updateScore(score) {
+  document.getElementById("scoreValue").textContent = score;
+
+  let imgIndex = 0;
+  if (score >= 500) imgIndex = 2;
+  else if (score >= 300) imgIndex = 1;
+  else if (score >= 100) imgIndex = 0;
+
+  document.getElementById("characterImg").src = charGroup[imgIndex];
 }
 
 function getRandomInt(min, max) {
@@ -577,6 +592,7 @@ function updateStageView(stage) {
 
 //게임오버되면 UI 리셋
 function updateUI(stage) {
+  updateScore(score);
   switch (stage) {
     case 'easy': {
       for (let i=0;i<stageConfig.easy.puzzleCount;i++) {

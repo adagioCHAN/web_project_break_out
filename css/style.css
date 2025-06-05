@@ -716,3 +716,33 @@ canvas.shaky {
   background-color: #FFE4F0;
 }
 
+#scorePanel {
+  position: absolute;
+  z-index: 999;
+  top: 20px;
+  left: 20px;
+  display: flex;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.9);
+  padding: 12px 20px;
+  border-radius: 20px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  font-family: 'Gowun Dodum', sans-serif;
+}
+
+#scoreInfo {
+  font-size: 20px;
+  font-weight: bold;
+  color: #ff6b81;
+  margin-right: 20px;
+}
+
+#characterImg {
+  width: 60px;
+  height: 60px;
+  object-fit: contain;
+  border: 2px solid #ccc;
+  background-color: #fff;
+}
+
+
