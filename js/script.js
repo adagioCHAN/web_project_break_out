@@ -57,7 +57,7 @@ const gameState = {
   stage:"easy",
   isRunning: false,
   gameStatus: "PLAYING", // READY, PLAYING, GAME_OVER, STAGE_CLEAR, ENDING
-  lives: 3,
+  lives: 1,
   isDead: false,
   ballReadyToMove: false,
 
@@ -68,7 +68,6 @@ const gameState = {
   puzzleBoard: Array(9).fill(null),
   intensity: 5,
   confessionUnlocked: false,
-  protectionBricks: [12, 13, 14], // 보호 벽돌 관련 함수 구현 예정
   confessionIndex: 13 // 고백 벽돌 관련 함수 구현 예정
 }
 
@@ -114,7 +113,7 @@ const MAXHARD = 500;
 let isDead = false;
 let ballReadyToMove = false;
 let score = 500;
-let lives = 3;
+let lives = 1;
 let gameStatus = "PLAYING"; 
 
 const stageConfig = {
@@ -171,7 +170,7 @@ const stageSettings = {
     offsetX: 0, offsetY: 0, ballSpeed: 5, ballRadius: 10, paddleWidth: 120
   },
   HARD: {
-    rows: 6, cols: 6, width: canvas.width / 6, height: canvas.height / 18, padding: 0,
+    rows: 3, cols: 3, width: canvas.width / 6, height: canvas.height / 18, padding: 0,
     offsetX: 0, offsetY: 0, ballSpeed: 5, ballRadius: 10, paddleWidth: 120
   }
 };
@@ -223,7 +222,7 @@ function Brick(x, y, type, index, text) {//벽돌 정의: D파트 디자인 추�
     this.height = stageSettings.HARD.height;
     this.draw = function(ctx) {
       if (!this.alive) return;
-      ctx.fillStyle = "white";
+      ctx.fillStyle = this.isConfession ? "#FF9999" : "white";
       ctx.fillRect(this.x, this.y, this.width, this.height);
 
       ctx.strokeStyle = "black";
@@ -247,7 +246,6 @@ function Brick(x, y, type, index, text) {//벽돌 정의: D파트 디자인 추�
   this.color = fixedColors[this.index];
 
   this.isConfession = false; // hard 모드에서 사용할 고백 벽돌
-  this.isLocked = false;
 }
 
 function updateScore(score) {
@@ -297,28 +295,29 @@ function generateBricks(stage) {
   const totalWidth = s.cols * s.width + (s.cols - 1) * s.padding;
   const offsetX = (canvas.width - totalWidth) / 2;
 
-  if (stage.toUpperCase() == "HARD") { // hard 모드 벽돌 생성(고백/보호 벽돌)
-    const confessionRow = 2;
-    const confessionCol = 2;
+  if (stage.toUpperCase() === "HARD") {
+  const totalBricks = s.rows * s.cols;
+  const confessionIndex = getRandomInt(0, totalBricks - 1); // 무작위로 고백 벽돌 위치 선정
 
-    for (let r = 0; r < s.rows; r++) {
-      for (let c = 0; c < s.cols; c++) {
-        const x = c * (s.width + s.padding);
-        const y = s.offsetY + r * (s.height + s.padding);
-        const index = r * s.cols + c;
-        const brick = new Brick(x, y, stage.toUpperCase(), index, null);
-        brick.width = s.width;
-        brick.height = s.height;
+  for (let r = 0; r < s.rows; r++) {
+    for (let c = 0; c < s.cols; c++) {
+      const x = c * (s.width + s.padding);
+      const y = s.offsetY + r * (s.height + s.padding);
+      const index = r * s.cols + c;
 
-        if (r == confessionRow && c == confessionCol) {
-          brick.isConfession = true;
-          brick.isLocked = true;
-        }
+      const brick = new Brick(x, y, stage.toUpperCase(), index, null);
+      brick.width = s.width;
+      brick.height = s.height;
 
-        bricks.push(brick);
+      if (index === confessionIndex) {
+        brick.isConfession = true;
       }
+
+      bricks.push(brick);
     }
   }
+}
+
   else {
   const totalBricks = s.rows * s.cols;
   const puzzleCount = stageConfig.easy.puzzleCount;
@@ -361,6 +360,8 @@ function applyStageSettings(stage) {
   const s = stageSettings[gameState.stage.toUpperCase()];
   if (!s) return;
   ballRadius = s.ballRadius;
+  ballX = canvas.width / 2;
+  ballY = canvas.height - 200;
   ballDX = s.ballSpeed;
   ballDY = -s.ballSpeed;
   paddleWidth = s.paddleWidth;
@@ -373,31 +374,6 @@ function applyStageSettings(stage) {
 document.addEventListener("keydown", function(e) {
   const keySetting = settingContainerState.keySetting.current;
   console.log(keySetting);
-
-  if (e.code == "Space") {
-    if (gameStatus == "GAME_OVER") {
-      score = 0;
-      lives = 3;
-      isDead = false;
-      gameStatus = "PLAYING";
-      updateUI(gameState.stage);
-      generateBricks(gameState.stage);
-      applyStageSettings(gameState.stage);
-      ballX = canvas.width / 2;
-      ballY = canvas.height - 200;
-      ballReadyToMove = false;
-      setTimeout(() => { ballReadyToMove = true; }, 1000);
-    } 
-    else if (isDead && gameStatus == "PLAYING") {
-      isDead = false;
-      ballX = paddleX + paddleWidth / 2;
-      ballY = paddleY - 50;
-      ballDX = stageSettings[gameState.stage.toUpperCase()].ballSpeed;
-      ballDY = -ballDX;
-      ballReadyToMove = false;
-      setTimeout(() => { ballReadyToMove = true; }, 1000);
-    }
-  }
 
   if(event.code == "Tab") {
     event.preventDefault();
@@ -592,7 +568,7 @@ function draw() {
           ballX = canvas.width / 2;
           ballY = canvas.height - 200;
           isDead = false;
-          lives = 3;
+          lives = 1;
           gameStatus = "PLAYING";
           ballReadyToMove = false;
           setTimeout(() => { ballReadyToMove = true; }, 1000);
@@ -608,18 +584,43 @@ function draw() {
   }
 }
  else if (gameStatus == "GAME_OVER") {
-    ctx.font = "24px 'Share Tech'";
-    ctx.textAlign = "center";
-    ctx.fillStyle = "#700";
-    ctx.fillText("Game Over", canvas.width / 2, canvas.height / 2);
-    ctx.fillText("Press Spacebar to Try Again", canvas.width / 2, canvas.height / 2 + 40);
-    ctx.textAlign = "start";
-  } else if (gameStatus == "ENDING") {//엔딩 시 동작: D파트 엔딩 연출과 연결
+    if (!draw.goHomeTriggered) {
+    draw.goHomeTriggered = true;
+    setTimeout(() => {
+      goHome();
+      draw.goHomeTriggered = false;
+    }, 1000); // 1초 후 홈 이동
+  }
+    console.log("hi");
+ } 
+ else if (gameStatus == "ENDING") {//엔딩 시 동작: D파트 엔딩 연출과 연결
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     if (!draw.endingTriggered) {
       draw.endingTriggered = true;
-      // UI 종료 후 fade 전환 등 처리
-      alert("모든 스테이지를 클리어했습니다!");
+
+      // 게임 관련 UI 숨김
+      document.getElementById("game-container").style.display = "none";
+      document.getElementById("uiPanel").style.display = "none";
+      document.getElementById("gameCanvas").style.display = "none";
+
+      // 엔딩 페이지 표시
+      const endingPage = document.getElementById("ending-page");
+      const happy = document.getElementById("happy-ending");
+      const sad = document.getElementById("sad-ending");
+
+      endingPage.style.display = "flex";
+      happy.style.display = "none";
+      sad.style.display = "none";
+
+      if (score >= 500) { // 호감도 500 이상일 때
+        happy.style.display = "flex";
+        const container = document.getElementById("happy-ending");
+        const lines = container.querySelectorAll("p");
+
+        lines.forEach((line, i) => {
+          line.style.animationDelay = `${i * 1.5}s`; // 0.6초 간격
+        });
+      }
     }
   }
 
@@ -899,21 +900,7 @@ function handleHardBrick(brick) {
   const idx = parseInt(brick.index);
   
   if (brick.isConfession) {
-    if (brick.isLocked) {
-      const unlocked = areProtectionBricksCleared(idx);
-      if (unlocked) {
-        // 보호 벽돌 제거됨 → 잠금 해제
-        brick.isLocked = false;
-        console.log("고백 벽돌 잠금 해제");
-      } else {
-        // 잠금 상태 → 실패 처리
-        console.log("일찍 고백 -> 실패");
-        gameStatus = "GAME_OVER";
-      }
-    } else {
-      // 잠금이 해제된 상태 → 고백 성공
-      gameStatus = "STAGE_CLEAR";
-    }
+    gameStatus = "STAGE_CLEAR";
   } else {
     // 일반 벽돌 처리
     gameState.intensity--;
@@ -1045,7 +1032,7 @@ function mainGame(handler){
       applyStageSettings(gameState.stage);
       ballX = canvas.width / 2;
       ballY = canvas.height-200;
-      lives = 3;
+      lives = 1;
       score = 0;
       isDead = false;
       gameStatus = "PLAYING";
@@ -1062,11 +1049,6 @@ function mainGame(handler){
     }
 };
 
-$(document).on("click", ".homeButton", function() {
-  console.log("홈 버튼 클릭됨");
-  goHome();
-});
-
 function goHome(){
   document.getElementById("select-page").style.display = "flex";
   document.getElementById("game-container").style.display = "none";
@@ -1076,8 +1058,11 @@ function goHome(){
 
   gameStatus = "READY"; // 추가: draw 중단
   draw.nextStageScheduled = false;
+  ballReadyToMove = false;
 
   /*설정 초기화*/
+  lives = 1;
+  isDead = false;
 }
 
 const settingContainerState = {
@@ -1160,4 +1145,5 @@ function musicControl(cid, cur) {
 
 document.getElementById("reload").addEventListener("click", () => {
   location.reload();
+  console.log("hi");
 });
