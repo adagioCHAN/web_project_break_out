@@ -860,5 +860,5 @@ canvas.shaky {
 
 #ending-page p {
   opacity: 0;
-  animation: fadeInUp 0.6s ease-out forwards; /* forwards: 애니메이션 끝난 상태 유지 */
+  animation: fadeInUp 1.5s ease-out forwards; /* forwards: 애니메이션 끝난 상태 유지 */
 }
