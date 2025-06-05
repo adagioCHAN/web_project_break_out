@@ -261,6 +261,24 @@ function updateScore(score) {
   document.getElementById("characterImg").src = charGroup[imgIndex];
 }
 
+function updateProfile(score) {
+  document.getElementById("profileScoreFancy").textContent = score;
+
+  let index = score >= 500 ? 2 : score >= 300 ? 1 : 0;
+  const names = ["하얀이", "말랑이", "설렘이"];
+  const descs = [
+    "짝사랑 상대가 자꾸 떠오르는 단계",
+    "서로 어색하지 않은 미묘한 사이",
+    "오늘은 꼭 고백해보고 싶은 설렘"
+  ];
+
+  document.getElementById("profileImgFancy").src = charGroup[index];
+  document.querySelector(".profile-name-fancy").textContent = names[index];
+  document.querySelector(".profile-desc-fancy").textContent = descs[index];
+}
+
+
+
 function getRandomInt(min, max) {
   return Math.floor(Math.random() * (max - min + 1)) + min;
 }
@@ -919,6 +937,8 @@ let timer = null
 
 function loop(){
   draw();
+  updateScore(score);
+  updateProfile(score);
   requestAnimationFrame(loop);
 }
 
