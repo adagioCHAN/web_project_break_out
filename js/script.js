@@ -618,12 +618,40 @@ function draw() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     if (!draw.endingTriggered) {
       draw.endingTriggered = true;
-      // UI 종료 후 fade 전환 등 처리
-      alert("모든 스테이지를 클리어했습니다!");
-    }
-  }
+      // 게임 관련 UI 숨김
+      document.getElementById("game-container").style.display = "none";
+      document.getElementById("uiPanel").style.display = "none";
+      document.getElementById("gameCanvas").style.display = "none";
 
-  ctx.restore();
+      // 엔딩 페이지 표시
+      const endingPage = document.getElementById("ending-page");
+      const happy = document.getElementById("happy-ending");
+      const sad = document.getElementById("sad-ending");
+
+      endingPage.style.display = "flex";
+      happy.style.display = "none";
+      sad.style.display = "none";
+
+      if (score >= 500) { // 호감도 500 이상일 때
+        happy.style.display = "flex";
+        const container = document.getElementById("happy-ending");
+        const lines = container.querySelectorAll("p");
+
+        lines.forEach((line, i) => {
+          line.style.animationDelay = `${i * 1.5}s`; // 0.6초 간격
+        });
+      } /*else { 호감도 미달 시 엔딩 분기 미구현
+        sad.style.display = "flex";
+        const container = document.getElementById("sad-ending");
+        const lines = container.querySelectorAll("p");
+
+        lines.forEach((line, i) => {
+          line.style.animationDelay = `${i * 0.6}s`; // 0.6초 간격
+        });
+      }*/
+    }
+    ctx.restore();
+  }
 }
 
 /* === B: 우측 UI 출력 === */
@@ -908,7 +936,7 @@ function handleHardBrick(brick) {
       } else {
         // 잠금 상태 → 실패 처리
         console.log("일찍 고백 -> 실패");
-        gameStatus = "GAME_OVER";
+        gameStatus = "STAGE_CLEAR";
       }
     } else {
       // 잠금이 해제된 상태 → 고백 성공
