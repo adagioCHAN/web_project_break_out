@@ -113,7 +113,7 @@ const MAXHARD = 500;
 // 게임 상태
 let isDead = false;
 let ballReadyToMove = false;
-let score = BASICSCORE;
+let score = 500;
 let lives = 3;
 let gameStatus = "PLAYING"; 
 
@@ -167,7 +167,7 @@ const stageSettings = {
     offsetX: 0, offsetY: 0, ballSpeed: 5, ballRadius: 10, paddleWidth: 120
   },
   MEDIUM: {
-    rows: 6, cols: 6, width: canvas.width / 6, height: canvas.height / 18, padding: 0,
+    rows: 1, cols: 6, width: canvas.width / 6, height: canvas.height / 18, padding: 0,
     offsetX: 0, offsetY: 0, ballSpeed: 5, ballRadius: 10, paddleWidth: 120
   },
   HARD: {
@@ -458,14 +458,21 @@ function collisionCheck() {
       ballDY = -ballDY;
       b.alive = false;
       //우선 배점 10점으로 설정
-      score += 10;
+      //score += 10;
       onBrickHit(b); // 벽돌 충돌 후 함수 호출
 
-      // 벽돌이 존재X -> 게임 클리어 판단
-      if (bricks.filter(brick => brick.alive).length == 0) {
-        gameStatus = "STAGE_CLEAR";
-        ballDX = 0;
-        ballDY = 0;
+      if (gameState.stage === "easy") {
+        if (puzzleState.board.every(Boolean)) {
+          gameStatus = "STAGE_CLEAR";
+          ballDX = 0;
+          ballDY = 0;
+        }
+      } else if (gameState.stage === "medium") {
+        if (bricks.filter(brick => brick.alive).length === 0) {
+          gameStatus = "STAGE_CLEAR";
+          ballDX = 0;
+          ballDY = 0;
+        }
       }
     }
   }
@@ -520,6 +527,7 @@ function update() {
 }
 
 function draw() {
+  if (gameStatus === "READY") return; 
   ctx.save();
 
   const scaleX = canvas.clientWidth / canvas.width;
@@ -535,38 +543,50 @@ function draw() {
 
   if (gameStatus == "PLAYING") update();
   else if (gameStatus == "STAGE_CLEAR") {
-    ctx.font = "24px 'Share Tech'";
-    ctx.textAlign = "center";
-    ctx.fillStyle = "#007";
-    ctx.fillText("Stage Clear!", canvas.width / 2, canvas.height / 2);
-    ctx.textAlign = "start";
+  ctx.font = "24px 'Share Tech'";
+  ctx.textAlign = "center";
+  ctx.fillStyle = "#007";
+  ctx.fillText("Stage Clear!", canvas.width / 2, canvas.height / 2);
+  ctx.textAlign = "start";
 
-    if (!draw.nextStageScheduled) {
-      draw.nextStageScheduled = true;
-      setTimeout(() => {
-        const currentIdx = gameState.stageOrder.indexOf(gameState.stage); //변수명 수정
-        if (currentIdx < gameState.stageOrder.length - 1) { //변수명 수정
-          const nextStage = gameState.stageOrder[currentIdx + 1]; //변수명 수정
-          
-          gameState.stage = nextStage; //gameState.stage를 인자로 직접 전달
-          generateBricks(gameState.stage); //위와 동일
-          applyStageSettings(gameState.stage); //위와 동일
+  if (!draw.nextStageScheduled) {
+    draw.nextStageScheduled = true;
+
+    setTimeout(() => {
+      const currentIdx = gameState.stageOrder.indexOf(gameState.stage);
+      const nextStage = gameState.stageOrder[currentIdx + 1];
+
+      let requiredScore = 0;
+      if (gameState.stage === "easy") requiredScore = 150;
+      else if (gameState.stage === "medium") requiredScore = 300;
+      else if (gameState.stage === "hard") requiredScore = 500;
+
+      if (score >= requiredScore) {
+        if (currentIdx < gameState.stageOrder.length - 1) {
+          gameState.stage = nextStage;
+          generateBricks(gameState.stage);
+          applyStageSettings(gameState.stage);
+          updateStageView(gameState.stage);
 
           ballX = canvas.width / 2;
           ballY = canvas.height - 200;
           isDead = false;
           lives = 3;
           gameStatus = "PLAYING";
-          updateStageView(gameState.stage); //패널 업데이트 추가
           ballReadyToMove = false;
           setTimeout(() => { ballReadyToMove = true; }, 1000);
         } else {
           gameStatus = "ENDING";
         }
-        draw.nextStageScheduled = false;
-      }, 2000);
-    }
-  } else if (gameStatus == "GAME_OVER") {
+      } else {
+        goHome(); // 홈으로 이동
+      }
+
+      draw.nextStageScheduled = false;
+    }, 2000);
+  }
+}
+ else if (gameStatus == "GAME_OVER") {
     ctx.font = "24px 'Share Tech'";
     ctx.textAlign = "center";
     ctx.fillStyle = "#700";
@@ -1030,6 +1050,9 @@ function goHome(){
   document.getElementById("gameCanvas").style.display = "none";
   document.getElementById("uiPanel").style.display = "none";
   document.getElementById("game-setting").style.display = "none";
+
+  gameStatus = "READY"; // 추가: draw 중단
+  draw.nextStageScheduled = false;
 
   /*설정 초기화*/
 }
