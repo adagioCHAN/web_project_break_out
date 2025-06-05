@@ -39,15 +39,6 @@ html, body {
   position: relative;
 }
 
-#stageTitle {
-  font-weight: bold;
-  margin-bottom: 15px;
-  position: absolute;
-  top: 10px;
-  right: 10px;
-  z-index: 999;
-}
-
 #uiContent {
   display: flex;
   justify-content: center;

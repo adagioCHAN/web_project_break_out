@@ -163,7 +163,7 @@ let bricks = [];
 
 const stageSettings = {
   EASY: {
-    rows: 6, cols: 6, width: canvas.width / 6, height: canvas.height / 18, padding: 0,
+    rows: 3, cols: 3, width: canvas.width / 6, height: canvas.height / 18, padding: 0,
     offsetX: 0, offsetY: 0, ballSpeed: 5, ballRadius: 10, paddleWidth: 120
   },
   MEDIUM: {
@@ -319,21 +319,42 @@ function generateBricks(stage) {
       }
     }
   }
-  else{
-    const totalWidth = s.cols * s.width + (s.cols - 1) * s.padding;
-    const offsetX = 0;
+  else {
+  const totalBricks = s.rows * s.cols;
+  const puzzleCount = stageConfig.easy.puzzleCount;
 
-    for (let r = 0; r < s.rows; r++) {
-      for (let c = 0; c < s.cols; c++) {
-        const x = offsetX + c * (s.width + s.padding);
-        const y = s.offsetY + r * (s.height + s.padding);
-        const brick = new Brick(x, y, gameState.stage.toUpperCase(), getRandomInt(0, stageConfig.easy.puzzleCount-1), getRandomMediumText());
-        brick.width = s.width;
-        brick.height = s.height;
-        bricks.push(brick);
-      }
+  const requiredColors = Array.from({ length: puzzleCount }, (_, i) => i);
+  for (let i = requiredColors.length - 1; i > 0; i--) {
+    const j = getRandomInt(0, i);
+    [requiredColors[i], requiredColors[j]] = [requiredColors[j], requiredColors[i]];
+  }
+
+  const remainingCount = totalBricks - requiredColors.length;
+  const additionalColors = Array.from({ length: remainingCount }, () => getRandomInt(0, puzzleCount - 1));
+
+  const allColors = [...requiredColors, ...additionalColors];
+  for (let i = allColors.length - 1; i > 0; i--) {
+    const j = getRandomInt(0, i);
+    [allColors[i], allColors[j]] = [allColors[j], allColors[i]];
+  }
+
+  const totalWidth = s.cols * s.width + (s.cols - 1) * s.padding;
+  const offsetX = 0;
+
+  let colorIndex = 0;
+  for (let r = 0; r < s.rows; r++) {
+    for (let c = 0; c < s.cols; c++) {
+      const x = offsetX + c * (s.width + s.padding);
+      const y = s.offsetY + r * (s.height + s.padding);
+      const color = allColors[colorIndex++];
+      const brick = new Brick(x, y, gameState.stage.toUpperCase(), color, getRandomMediumText());
+      brick.width = s.width;
+      brick.height = s.height;
+      bricks.push(brick);
     }
   }
+}
+
 }
 
 function applyStageSettings(stage) {
@@ -637,7 +658,7 @@ function updateUI(stage) {
         $(`#slot-${i}`)
         .attr({"src":"assets/img/gray.png"})
         .css({
-          "border": "2px solid" + fixedColors[i],     // 원하는 색상/두께
+          "border": "5px solid" + fixedColors[i],     // 원하는 색상/두께
           "box-sizing": "border-box"       // 이미지 크기 유지
         });
         puzzleState.board[i] = null;
@@ -808,9 +829,11 @@ function handleMediumBrick(brick) {
   if (!text) return;
   //gameState.fullSentence += text;
   
-  const score = getScoreForText(text);
+  const currentScore = getScoreForText(text);
 
-  var message = `${text}(+${score})`; 
+  var message = `${text}(+${currentScore})`; 
+
+  score += currentScore;
 
   sendMessage(message, score);
 }
