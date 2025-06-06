@@ -61,9 +61,7 @@ const gameState = {
   isDead: false,
   ballReadyToMove: false,
 
-  fullSentence: "",
-  brickCount: 0,
-  messageCount: 0,
+  currentIndex: 0,
 
   puzzleBoard: Array(9).fill(null),
   intensity: 5,
@@ -108,13 +106,15 @@ const BASICSCORE = 100;
 const MAXEASY = 150;
 const MAXMEDIUM = 300;
 const MAXHARD = 500;
+const FAILURESCORE = -50;
 
 // 게임 상태
 let isDead = false;
 let ballReadyToMove = false;
-let score = 500;
+let score = BASICSCORE;
 let lives = 1;
-let gameStatus = "PLAYING"; 
+let gameStatus = "READY"; 
+let mediumScore = 0;
 
 const stageConfig = {
   easy: {
@@ -166,16 +166,16 @@ const stageSettings = {
     offsetX: 0, offsetY: 0, ballSpeed: 5, ballRadius: 10, paddleWidth: 120
   },
   MEDIUM: {
-    rows: 1, cols: 6, width: canvas.width / 6, height: canvas.height / 18, padding: 0,
+    rows: 1, cols: 3, width: canvas.width / 6, height: canvas.height / 18, padding: 0,
     offsetX: 0, offsetY: 0, ballSpeed: 5, ballRadius: 10, paddleWidth: 120
   },
   HARD: {
-    rows: 3, cols: 3, width: canvas.width / 6, height: canvas.height / 18, padding: 0,
+    rows: 3, cols: 6, width: canvas.width / 6, height: canvas.height / 18, padding: 0,
     offsetX: 0, offsetY: 0, ballSpeed: 5, ballRadius: 10, paddleWidth: 120
   }
 };
 
-function Brick(x, y, type, index, text) {//벽돌 정의: D파트 디자인 추가 예
+function Brick(x, y, type, index, textIdx) {//벽돌 정의: D파트 디자인 추가 예
   this.x = x;
   this.y = y;
   switch(gameState.stage){
@@ -203,10 +203,14 @@ function Brick(x, y, type, index, text) {//벽돌 정의: D파트 디자인 추�
     this.height = stageSettings.MEDIUM.height;
     this.draw = function(ctx) {
       if (!this.alive) return;
-      ctx.fillStyle = "white";
+      switch(textIdx){
+      case 0: ctx.fillStyle = "#cce0ff"; break;
+      case 1: ctx.fillStyle = "#fff9c4"; break;
+      case 2: ctx.fillStyle = "#ffe0e0"; break; 
+      }
       ctx.fillRect(this.x, this.y, this.width, this.height);
 
-      ctx.strokeStyle = "black";
+      ctx.strokeStyle = "white";
       ctx.lineWidth = 2;
       ctx.strokeRect(
         this.x + 1, 
@@ -222,10 +226,10 @@ function Brick(x, y, type, index, text) {//벽돌 정의: D파트 디자인 추�
     this.height = stageSettings.HARD.height;
     this.draw = function(ctx) {
       if (!this.alive) return;
-      ctx.fillStyle = this.isConfession ? "#FF9999" : "white";
+      ctx.fillStyle = this.isConfession ? "#FF9999" : "#d9d7d7";
       ctx.fillRect(this.x, this.y, this.width, this.height);
 
-      ctx.strokeStyle = "black";
+      ctx.strokeStyle = "white";
       ctx.lineWidth = 2;
       ctx.strokeRect(
         this.x + 1, 
@@ -241,7 +245,7 @@ function Brick(x, y, type, index, text) {//벽돌 정의: D파트 디자인 추�
   this.alive = true;
   this.type = type;
   this.index = index; // easy 모드에서 사용할 벽돌 index
-  this.text = text; // medium 모드에서 사용할 벽돌 text (stageConfig.medium.wordScores로 초기화)
+  this.textIdx = textIdx; // medium 모드에서 사용할 벽돌 text의 인덱스
 
   this.color = fixedColors[this.index];
 
@@ -263,10 +267,10 @@ function updateProfile(score) {
   document.getElementById("profileScoreFancy").textContent = score;
 
   let index = score >= 500 ? 2 : score >= 300 ? 1 : 0;
-  const names = ["하얀이", "말랑이", "설렘이"];
+  const names = ["하얀이", "말랑이", "사랑이"];
   const descs = [
     "짝사랑 상대가 자꾸 떠오르는 단계",
-    "서로 어색하지 않은 미묘한 사이",
+    "밤마다 카톡으로 연락하는 단계",
     "오늘은 꼭 고백해보고 싶은 설렘"
   ];
 
@@ -279,12 +283,6 @@ function getRandomInt(min, max) {
   return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
-function getRandomMediumText() {
-  const wordList = stageConfig.medium.wordScores;
-  const randomIndex = Math.floor(Math.random() * wordList.length);
-  return wordList[randomIndex].text;
-}
-
 function generateBricks(stage) {
   bricks = [];
   const s = stageSettings[stage.toUpperCase()];
@@ -292,6 +290,11 @@ function generateBricks(stage) {
 
   const totalWidth = s.cols * s.width + (s.cols - 1) * s.padding;
   const offsetX = (canvas.width - totalWidth) / 2;
+  const textIdx = [0, 1, 2];
+  for (let i = textIdx.length - 1; i > 0; i--) {
+    const j = getRandomInt(0, i);
+    [textIdx[i], textIdx[j]] = [textIdx[j], textIdx[i]];
+  }
 
   if (stage.toUpperCase() === "HARD") {
     const totalBricks = s.rows * s.cols;
@@ -343,7 +346,7 @@ function generateBricks(stage) {
         const x = offsetX + c * (s.width + s.padding);
         const y = s.offsetY + r * (s.height + s.padding);
         const color = allColors[colorIndex++];
-        const brick = new Brick(x, y, gameState.stage.toUpperCase(), color, getRandomMediumText());
+        const brick = new Brick(x, y, gameState.stage.toUpperCase(), color, textIdx[c]);
         brick.width = s.width;
         brick.height = s.height;
         bricks.push(brick);
@@ -461,10 +464,16 @@ function collisionCheck() {
           showScorePopup(100);
         }
       } else if (gameState.stage === "medium") {
-        if (bricks.filter(brick => brick.alive).length === 0) {
+        if (gameState.currentIndex >= mediumStageDialogs.length) {
           gameStatus = "STAGE_CLEAR";
           ballDX = 0;
           ballDY = 0;
+          score += mediumScore;
+          showScorePopup(mediumScore);
+        } else {
+          setTimeout(() => {
+            generateBricks(gameState.stage);
+          }, 1500);
         }
       }
     }
@@ -477,6 +486,14 @@ function showScorePopup(amount) {
   popup.classList.remove("score-show"); // 재적용 위해 제거
   void popup.offsetWidth;               // reflow 강제
   popup.classList.add("score-show");
+}
+
+function showNegativeScorePopup(amount) {
+  const popup2 = document.getElementById("score-popup-negative");
+  popup2.textContent = `${amount}`;
+  popup2.classList.remove("score-show"); // 재적용 위해 제거
+  void popup2.offsetWidth;               // reflow 강제
+  popup2.classList.add("score-show");
 }
 
 
@@ -578,9 +595,33 @@ function draw() {
           ballReadyToMove = false;
           setTimeout(() => { ballReadyToMove = true; }, 1000);
         }else{
+          score += FAILURESCORE;
+          showNegativeScorePopup(FAILURESCORE);
           goHome();
         }
       } else {
+        const happy = document.getElementById("happy-ending");
+        const sad = document.getElementById("sad-ending");
+
+        if (score >= 500) {
+          happy.style.display = "flex";
+          const lines = happy.querySelectorAll("p");
+          lines.forEach((line, i) => {
+            line.style.animationDelay = `${i * 1.5}s`;
+            if (line.classList.contains("ending-final-line")) {
+              line.classList.add("ending-highlight");
+            }
+          });
+        } else {
+          sad.style.display = "flex";
+          const lines = sad.querySelectorAll("p");
+          lines.forEach((line, i) => {
+            line.style.animationDelay = `${i * 1.5}s`;
+            if (line.classList.contains("ending-final-line")) {
+              line.classList.add("ending-sad");
+            }
+          });
+        }
         gameStatus = "ENDING";
       }
 
@@ -591,6 +632,8 @@ function draw() {
  else if (gameStatus == "GAME_OVER") {
     if (!draw.goHomeTriggered) {
     draw.goHomeTriggered = true;
+    score += FAILURESCORE;
+    showNegativeScorePopup(FAILURESCORE);
     setTimeout(() => {
       goHome();
       draw.goHomeTriggered = false;
@@ -686,6 +729,8 @@ function updateUI(stage) {
         container.removeChild(child[i]);
         canvas.classList.remove("shaky");
       }
+      gameState.currentIndex = 0;
+      sendQuestion();
       break;
     }
     case 'hard': {
@@ -701,56 +746,62 @@ function revealPuzzleImage(index) {
   $(`#slot-${index}`).attr("src", `assets/img/puzzle-${index+1}.png`);
 }
 
-const reactionMap = [
-  { min: 3, text: "😊" },
-  { min: 2, text: "😐" },
-  { min: 0, text: "😢" }
-];
-
-//점수에 따른 반응 표시 함수
-function getReactionText(score) {
-  return (reactionMap.find(r => score >= r.min) || {}).text || "";
+const mediumStageDialogs = [
+  {
+    question: "왜 갑자기 연락했어?",
+    options: [
+      { text: "그냥... 네 목소리가 듣고 싶었어", score: 50 },
+      { text: "할 말이 좀 있어서", score: 30 },
+      { text: "별건 아니야", score: 0 }
+    ]
+  },
+  {
+    question: "시간 있으면 나갈 거야?",
+    options: [
+      { text: "응! 당연하지, 너만 괜찮다면", score: 50 },
+      { text: "음... 너도 나갈 거라면", score: 30 },
+      { text: "아니, 그냥 물어봤어", score: 0 }
+    ]
+  },
+  {
+    question: "어제는 왜 그렇게 말했어?",
+    options: [
+      { text: "그땐 너한테 진심이었어", score: 50 },
+      { text: "그냥 기분이 이상했어", score: 30 },
+      { text: "그랬나?", score: 0 }
+    ]
+  },
+  {
+    question: "사람들이 너랑 나랑 친하대",
+    options: [
+      { text: "난 그 말 듣고 기분 좋았어", score: 50 },
+      { text: "그런가...? 난 잘 모르겠던데", score: 30 },
+      { text: "헐, 왜 그런 소문이...", score: 0 }
+    ]
+  },
+  {
+  question: "내가 갑자기 연락 안 해도 신경 써?",
+  options: [
+    { text: "매일 기다렸는데...", score: 50 },
+    { text: "조금은 신경 쓰였어", score: 30 },
+    { text: "아니? 괜찮았어", score: 0 }
+  ]
 }
+]
 
-//메시지 출력
-function sendMessage(message, score) {
-  var chatting = document.getElementById("chatting");
-  if (message == "") return;
-  gameState.fullSentence == "";
-
-  $(".message").animate({bottom: "+=100px"});
-
-  var container = document.createElement("div");
-  container.classList.add("message", "new");
-
-  var sentContainer = document.createElement("div");
-  sentContainer.setAttribute("class", "sent");
-
-  var sentDiv = document.createElement("div");
-  sentDiv.setAttribute("class", "sent-content");
-  sentDiv.innerHTML = message;
-  sentContainer.appendChild(sentDiv);
-  //chatLine.remove();  // 복제 후 원본 삭제
-
-  var sentImg = document.createElement("img");
-  sentImg.setAttribute("class", "player-chat-img");
-  sentImg.setAttribute("src", "assets/img/kakaotalk-talk.png");
-  sentContainer.appendChild(sentImg);
-
-  container.appendChild(sentContainer);
-  chatting.appendChild(container);
-  $(sentContainer).animate({bottom: "+=50px"});
-
+function sendQuestion() {
   setTimeout(() => {
-    container.classList.remove("new");
+    $(".message").animate({bottom: "+=50px"}, 300);
+    var chatting = document.getElementById("chatting");
+    var container = document.createElement("div");
+    container.classList.add("message");
 
     var replyContainer = document.createElement("div");
-    replyContainer.setAttribute("class", "reply");
+    replyContainer.classList.add("reply", "new");
 
-    var replyText = getReactionText(score);
     var replyDiv = document.createElement("div");
     replyDiv.setAttribute("class", "reply-line");
-    replyDiv.textContent = replyText;
+    replyDiv.textContent = mediumStageDialogs[gameState.currentIndex].question;
     replyContainer.appendChild(replyDiv);
   
     var replyImg = document.createElement("img");
@@ -759,28 +810,77 @@ function sendMessage(message, score) {
     replyContainer.appendChild(replyImg);
 
     container.appendChild(replyContainer);
-  }, 400);
+    chatting.appendChild(container);
+  }, 1000)
+}
+
+//메시지 출력
+function sendMessage(message) {
+  for (let i=0; i < gameState.currentIndex; i++) {
+    $(".message").eq(i).animate({bottom: "+=50px"}, 300)
+    console.log(i);
+  }
+  $(".reply").eq(gameState.currentIndex).animate({bottom: "+=50px"}, 300);
+
+  var chatting = document.getElementById("chatting");
+  var container = $(".message").eq(gameState.currentIndex);
+  if (message == "") return;
+
+  var sentContainer = document.createElement("div");
+  sentContainer.setAttribute("class", "sent");
+
+  var sentDiv = document.createElement("div");
+  sentDiv.setAttribute("class", "sent-content");
+  sentDiv.innerHTML = message;
+  sentContainer.appendChild(sentDiv);
+
+  var sentImg = document.createElement("img");
+  sentImg.setAttribute("class", "player-chat-img");
+  sentImg.setAttribute("src", "assets/img/kakaotalk-talk.png");
+  sentContainer.appendChild(sentImg);
+
+  container.append(sentContainer);
 }
 
 //hard 스테이지
 //감정 그래프 및 이미지 속도 변화 함수
 function updateGraphMovement(intensity) {
-  const video = document.getElementById("graph-video");
-  let rate;
-  if (intensity >= 0) rate = 4;
-  else if (intensity >= -5) rate = 3.5;
-  else if (intensity >= -10) rate = 3.0;
-  else if (intensity >= -15) rate = 2.5;
-  else if (intensity >= -20) rate = 2.0;
-  else if (intensity >= -25) rate = 1.5;
-  else rate = 1.0;
+  // 속도: 빠를수록 애니메이션 duration 짧게
+  let duration;
+  if (intensity >= 0)       duration = 0.4;
+  else if (intensity >= -5) duration = 0.6;
+  else if (intensity >= -10) duration = 0.9;
+  else if (intensity >= -15) duration = 1.4;
+  else if (intensity >= -20) duration = 2.0;
+  else if (intensity >= -25) duration = 3.0;
+  else                      duration = 4.5;
 
-  video.playbackRate = rate;
-  const baseDuration = 3;
-  document.getElementById("heart").style.animationDuration = `${baseDuration / (rate)}s`;
+  // 스케일 범위도 변경
+  let scaleMin = 0.4;
+  let scaleMax = 1.8;
 
-  console.log(rate); //디버깅 코드
+  if (intensity >= 0) {
+    scaleMin = 1.0;
+    scaleMax = 2.0;
+  } else if (intensity >= -10) {
+    scaleMin = 0.8;
+    scaleMax = 1.5;
+  } else if (intensity >= -20) {
+    scaleMin = 0.6;
+    scaleMax = 1.2;
+  } else {
+    scaleMin = 0.4;
+    scaleMax = 1.0;
+  }
+
+  const heart = document.getElementById("heart");
+  heart.style.animationDuration = `${duration}s`;
+  heart.style.setProperty('--scale-min', scaleMin);
+  heart.style.setProperty('--scale-max', scaleMax);
+
+  console.log(`[Pulse] intensity: ${intensity}, duration: ${duration}s, scale: ${scaleMin}~${scaleMax}`);
 }
+
 
 /* === C: 스테이지별 게임 규칙 === */
 function onBrickHit(brick) {
@@ -818,7 +918,6 @@ function handleEasyBrick(brick) {
     revealPuzzleImage(index);
 
     if (puzzleState.board.every(Boolean)) {
-      $("#puzzle-board").css("gap", "0px");
       $(conf.endMessageSelector)
         .removeClass("hidden")
         .text(conf.messageText);
@@ -837,18 +936,21 @@ function getScoreForText(text) {
 function handleMediumBrick(brick) {
   const conf = stageConfig.medium;
 
-  var text = "";
-  text = brick.text;
+  var text = mediumStageDialogs[gameState.currentIndex].options[brick.textIdx].text;
   if (!text) return;
-  //gameState.fullSentence += text;
   
-  const currentScore = getScoreForText(text);
+  const currentScore = mediumStageDialogs[gameState.currentIndex].options[brick.textIdx].score;
 
   var message = `${text}(+${currentScore})`; 
 
-  score += currentScore;
+  mediumScore += currentScore;
 
-  sendMessage(message, score);
+  sendMessage(message);
+
+  gameState.currentIndex++;
+  if (gameState.currentIndex < mediumStageDialogs.length) {
+    sendQuestion();
+  }
 }
 
 function updateCanvasShake(intensity) {
@@ -1153,14 +1255,6 @@ function musicControl(cid, cur) {
     }
     console.log("setting changed");
   }
-}
-
-const endingText = document.getElementById("ending-final-line");
-
-if (score >= 500) {
-  endingText.classList.add("ending-highlight");
-} else {
-  endingText.classList.add("ending-sad");
 }
 
 document.body.addEventListener("click", (e) => {
