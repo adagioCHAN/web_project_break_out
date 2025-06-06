@@ -275,8 +275,6 @@ function updateProfile(score) {
   document.querySelector(".profile-desc-fancy").textContent = descs[index];
 }
 
-
-
 function getRandomInt(min, max) {
   return Math.floor(Math.random() * (max - min + 1)) + min;
 }
@@ -296,64 +294,62 @@ function generateBricks(stage) {
   const offsetX = (canvas.width - totalWidth) / 2;
 
   if (stage.toUpperCase() === "HARD") {
-  const totalBricks = s.rows * s.cols;
-  const confessionIndex = getRandomInt(0, totalBricks - 1); // 무작위로 고백 벽돌 위치 선정
+    const totalBricks = s.rows * s.cols;
+    const confessionIndex = getRandomInt(0, totalBricks - 1); // 무작위로 고백 벽돌 위치 선정
 
-  for (let r = 0; r < s.rows; r++) {
-    for (let c = 0; c < s.cols; c++) {
-      const x = c * (s.width + s.padding);
-      const y = s.offsetY + r * (s.height + s.padding);
-      const index = r * s.cols + c;
+    for (let r = 0; r < s.rows; r++) {
+      for (let c = 0; c < s.cols; c++) {
+        const x = c * (s.width + s.padding);
+        const y = s.offsetY + r * (s.height + s.padding);
+        const index = r * s.cols + c;
 
-      const brick = new Brick(x, y, stage.toUpperCase(), index, null);
-      brick.width = s.width;
-      brick.height = s.height;
+        const brick = new Brick(x, y, stage.toUpperCase(), index, null);
+        brick.width = s.width;
+        brick.height = s.height;
 
-      if (index === confessionIndex) {
-        brick.isConfession = true;
+        if (index === confessionIndex) {
+          brick.isConfession = true;
+        }
+
+        bricks.push(brick);
       }
-
-      bricks.push(brick);
     }
   }
-}
-
   else {
-  const totalBricks = s.rows * s.cols;
-  const puzzleCount = stageConfig.easy.puzzleCount;
+    const totalBricks = s.rows * s.cols;
+    const puzzleCount = stageConfig.easy.puzzleCount;
 
-  const requiredColors = Array.from({ length: puzzleCount }, (_, i) => i);
-  for (let i = requiredColors.length - 1; i > 0; i--) {
-    const j = getRandomInt(0, i);
-    [requiredColors[i], requiredColors[j]] = [requiredColors[j], requiredColors[i]];
-  }
+    const requiredColors = Array.from({ length: puzzleCount }, (_, i) => i);
+    for (let i = requiredColors.length - 1; i > 0; i--) {
+      const j = getRandomInt(0, i);
+      [requiredColors[i], requiredColors[j]] = [requiredColors[j], requiredColors[i]];
+    }
 
-  const remainingCount = totalBricks - requiredColors.length;
-  const additionalColors = Array.from({ length: remainingCount }, () => getRandomInt(0, puzzleCount - 1));
+    const remainingCount = totalBricks - requiredColors.length;
+    const additionalColors = Array.from({ length: remainingCount }, () => getRandomInt(0, puzzleCount - 1));
 
-  const allColors = [...requiredColors, ...additionalColors];
-  for (let i = allColors.length - 1; i > 0; i--) {
-    const j = getRandomInt(0, i);
-    [allColors[i], allColors[j]] = [allColors[j], allColors[i]];
-  }
+    const allColors = [...requiredColors, ...additionalColors];
+    for (let i = allColors.length - 1; i > 0; i--) {
+      const j = getRandomInt(0, i);
+      [allColors[i], allColors[j]] = [allColors[j], allColors[i]];
+    }
 
-  const totalWidth = s.cols * s.width + (s.cols - 1) * s.padding;
-  const offsetX = 0;
+    const totalWidth = s.cols * s.width + (s.cols - 1) * s.padding;
+    const offsetX = 0;
 
-  let colorIndex = 0;
-  for (let r = 0; r < s.rows; r++) {
-    for (let c = 0; c < s.cols; c++) {
-      const x = offsetX + c * (s.width + s.padding);
-      const y = s.offsetY + r * (s.height + s.padding);
-      const color = allColors[colorIndex++];
-      const brick = new Brick(x, y, gameState.stage.toUpperCase(), color, getRandomMediumText());
-      brick.width = s.width;
-      brick.height = s.height;
-      bricks.push(brick);
+    let colorIndex = 0;
+    for (let r = 0; r < s.rows; r++) {
+      for (let c = 0; c < s.cols; c++) {
+        const x = offsetX + c * (s.width + s.padding);
+        const y = s.offsetY + r * (s.height + s.padding);
+        const color = allColors[colorIndex++];
+        const brick = new Brick(x, y, gameState.stage.toUpperCase(), color, getRandomMediumText());
+        brick.width = s.width;
+        brick.height = s.height;
+        bricks.push(brick);
+      }
     }
   }
-}
-
 }
 
 function applyStageSettings(stage) {
@@ -454,8 +450,6 @@ function collisionCheck() {
       ballY - ballRadius < b.y + b.height) {
       ballDY = -ballDY;
       b.alive = false;
-      //우선 배점 10점으로 설정
-      //score += 10;
       onBrickHit(b); // 벽돌 충돌 후 함수 호출
 
       if (gameState.stage === "easy") {
@@ -463,6 +457,8 @@ function collisionCheck() {
           gameStatus = "STAGE_CLEAR";
           ballDX = 0;
           ballDY = 0;
+          score += 100;
+          showScorePopup(100);
         }
       } else if (gameState.stage === "medium") {
         if (bricks.filter(brick => brick.alive).length === 0) {
@@ -474,6 +470,15 @@ function collisionCheck() {
     }
   }
 }
+
+function showScorePopup(amount) {
+  const popup = document.getElementById("score-popup");
+  popup.textContent = `+${amount}`;
+  popup.classList.remove("score-show"); // 재적용 위해 제거
+  void popup.offsetWidth;               // reflow 강제
+  popup.classList.add("score-show");
+}
+
 
 function update() {
   paddleDX = leftPressed ? -paddleSpeed : rightPressed ? paddleSpeed : 0;
@@ -558,8 +563,8 @@ function draw() {
       else if (gameState.stage === "medium") requiredScore = 300;
       else if (gameState.stage === "hard") requiredScore = 500;
 
-      if (score >= requiredScore) {
-        if (currentIdx < gameState.stageOrder.length - 1) {
+      if (currentIdx < gameState.stageOrder.length - 1) {
+        if(score >= requiredScore){
           gameState.stage = nextStage;
           generateBricks(gameState.stage);
           applyStageSettings(gameState.stage);
@@ -572,11 +577,11 @@ function draw() {
           gameStatus = "PLAYING";
           ballReadyToMove = false;
           setTimeout(() => { ballReadyToMove = true; }, 1000);
-        } else {
-          gameStatus = "ENDING";
+        }else{
+          goHome();
         }
       } else {
-        goHome(); // 홈으로 이동
+        gameStatus = "ENDING";
       }
 
       draw.nextStageScheduled = false;
@@ -620,10 +625,17 @@ function draw() {
         lines.forEach((line, i) => {
           line.style.animationDelay = `${i * 1.5}s`; // 0.6초 간격
         });
+      }else{
+        sad.style.display = "flex";
+        const container = document.getElementById("sad-ending");
+        const lines = container.querySelectorAll("p");
+
+        lines.forEach((line, i) => {
+          line.style.animationDelay = `${i * 1.5}s`; // 0.6초 간격
+        });
       }
     }
   }
-
   ctx.restore();
 }
 
@@ -1143,7 +1155,17 @@ function musicControl(cid, cur) {
   }
 }
 
-document.getElementById("reload").addEventListener("click", () => {
-  location.reload();
-  console.log("hi");
+const endingText = document.getElementById("ending-final-line");
+
+if (score >= 500) {
+  endingText.classList.add("ending-highlight");
+} else {
+  endingText.classList.add("ending-sad");
+}
+
+document.body.addEventListener("click", (e) => {
+  if (e.target.classList.contains("reload")) {
+    location.reload();
+  }
 });
+

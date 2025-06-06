@@ -456,7 +456,7 @@ canvas.shaky {
   box-shadow: 0 4px 8px rgba(255, 105, 180, 0.3);
 }
 
-#reload {
+.reload {
   margin-top: 30px;
   background: none;
   border: none;
@@ -464,6 +464,7 @@ canvas.shaky {
   font-size: 16px;
   text-decoration: underline;
   cursor: pointer;
+  z-index: 999;
 }
 
 #settingButton {
@@ -590,7 +591,7 @@ canvas.shaky {
   left: 50%;
   transform: translate(-50%, -50%);
   width: 90vw;
-  min-height: 90vh;            /* ✔ 최소 높이 보장 */
+  min-height: 90vh;
   background: white;
   border-radius: 32px;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
@@ -800,7 +801,7 @@ canvas.shaky {
   margin-top: 10px;
 }
 
-#ending-page{
+#ending-page {
   display: none;
   flex-direction: column;
   align-items: center;
@@ -813,30 +814,61 @@ canvas.shaky {
 
   width: 90vw;
   height: 85vh;
-  background-color: white;
+  background: linear-gradient(to bottom right, #fff6fb, #ffffff); /* 부드러운 배경 */
   border-radius: 32px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 10px 40px rgba(255, 190, 235, 0.25);
   z-index: 100;
-  padding: 50px 30px;
+  padding: 60px 40px;
   box-sizing: border-box;
-  font-family: 'Spoqa Han Sans Neo', 'sans-serif'; /* select-page와 어울리는 폰트 */
+  font-family: 'Gowun Batang', serif;
   text-align: center;
+  overflow-y: auto;
 }
 
+/* 공통 스타일 */
 #happy-ending,
 #sad-ending {
   display: none;
   flex-direction: column;
-  gap: 15px;
-  font-size: 1.2rem;
-  color: #333;
+  gap: 20px;
+  font-size: 2.2rem;
+  color: #444;
+  line-height: 1.8;
+  animation: fadeInFancy 1s ease-out forwards;
 }
 
+/* 텍스트 하나씩 등장 */
 #ending-page p {
   opacity: 0;
-  animation: fadeInUp 0.6s ease-out forwards; /* forwards: 애니메이션 끝난 상태 유지 */
+  animation: fadeInFancy 0.8s ease-out forwards;
 }
 
+#happy-ending p:nth-child(1),
+#sad-ending p:nth-child(1) { animation-delay: 0.3s; }
+#happy-ending p:nth-child(2),
+#sad-ending p:nth-child(2) { animation-delay: 0.6s; }
+#happy-ending p:nth-child(3),
+#sad-ending p:nth-child(3) { animation-delay: 0.9s; }
+#happy-ending p:nth-child(4),
+#sad-ending p:nth-child(4) { animation-delay: 1.2s; }
+
+/* 기본 강조문 (500 이상일 때) */
+#ending-page p.ending-highlight {
+  color: #ff4d8a;
+  font-weight: bold;
+  font-size: 3rem;
+  text-shadow: 0 0 8px rgba(255, 100, 150, 0.2);
+}
+
+/* 우울한 파란 강조문 (500 미만일 때) */
+#ending-page p.ending-sad {
+  color: #5577cc;
+  font-weight: bold;
+  font-size: 2.8rem;
+  text-shadow: 0 0 8px rgba(80, 120, 180, 0.2);
+}
+
+/* 애니메이션 */
 @keyframes fadeInFancy {
   0% {
     opacity: 0;
@@ -907,5 +939,39 @@ canvas.shaky {
     transform: translateY(-12px);
   }
 }
+
+#score-popup {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 4rem;
+  font-weight: bold;
+  color: #ff4d8a;
+  opacity: 0;
+  pointer-events: none;
+  z-index: 999;
+  text-shadow: 0 0 10px rgba(255, 100, 150, 0.4);
+}
+
+@keyframes popupScore {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.5);
+  }
+  30% {
+    opacity: 1;
+    transform: translate(-50%, -60%) scale(1.2);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -80%) scale(1);
+  }
+}
+
+.score-show {
+  animation: popupScore 1.2s ease-out forwards;
+}
+
 
 
