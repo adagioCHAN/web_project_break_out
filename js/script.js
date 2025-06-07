@@ -921,7 +921,6 @@ function handleHardBrick(brick) {
 
 /* 관리자 모드*/
 const adminKeys = new Set();
-const requiredKeys = new Set(['s', 'c', 'o', 'r', 'e']);
 
 document.getElementById("admin-score-submit").addEventListener("click", () => {
   const inputVal = parseInt(document.getElementById("admin-score-input").value);
@@ -941,7 +940,9 @@ document.addEventListener("keydown", function(e) {
 
   adminKeys.add(e.key.toLowerCase());
 
-  if ([...requiredKeys].every(k => adminKeys.has(k))) {
+  //ctrl+shift+s 누르면 관리자 모드 진입
+  if (e.ctrlKey && e.shiftKey && e.key.toLowerCase() === "s") {
+    e.preventDefault();
     document.getElementById("admin-score-modal").classList.remove("hidden");
   }
 
