@@ -431,7 +431,7 @@ function applyStageSettings(stage) {
 function drawBall() {
   ctx.beginPath();
   ctx.arc(ballX, ballY, ballRadius, 0, Math.PI * 2);
-  ctx.fillStyle = "#f55";
+  ctx.fillStyle = "#C797BF";
   ctx.fill();
   ctx.closePath();
 }
@@ -439,7 +439,7 @@ function drawBall() {
 function drawPaddle() {
   ctx.beginPath();
   ctx.rect(paddleX, paddleY, paddleWidth, paddleHeight);
-  ctx.fillStyle = "#333";
+  ctx.fillStyle = "#dcdcdc";
   ctx.fill();
   ctx.closePath();
 }
@@ -1188,7 +1188,7 @@ function mainGame(handler){
     }
 };
 
-/* screen_게임시작 */
+/* screen_게임 시작 */
 let timer = null
 
 function loop(){
@@ -1219,12 +1219,6 @@ document.getElementById("start-btn").addEventListener("click", () => {
 });
 
 /* screen_튜토리얼 */
-document.body.addEventListener("click", (e) => {
-  if (e.target.classList.contains("reload")) {
-    location.reload();
-  }
-});
-
 let tutorialIndex = 0;
 const slides = document.querySelectorAll(".tutorial-slide");
 
@@ -1248,3 +1242,9 @@ document.addEventListener("DOMContentLoaded", () => {
   showSlide(tutorialIndex);
 });
 
+/* util_게임 종료 */
+document.body.addEventListener("click", (e) => {
+  if (e.target.classList.contains("reload")) {
+    location.reload();
+  }
+});
