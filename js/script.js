@@ -103,9 +103,9 @@ const charGroup = [
 ]
 
 const BASICSCORE = 100;
-const MAXEASY = 150;
-const MAXMEDIUM = 300;
-const MAXHARD = 500;
+const MAXEASY = 100;
+const MAXMEDIUM = 200;
+const MAXHARD = 400;
 const FAILURESCORE = -50;
 
 let isDead = false;
@@ -215,6 +215,20 @@ const mediumStageDialogs = [
 const puzzleState = {
   board: Array(stageConfig.easy.puzzleCount).fill(null)
 };
+
+
+/* 점수 하한선 설정 */
+setInterval(() => {
+  if (score < BASICSCORE) {
+    score = BASICSCORE;
+    console.log("score가 너무 낮아서 100으로 조정됨");
+    document.getElementById("alertScore").style.display = "flex";
+    document.getElementById("alertConfirm").onclick = () => {
+    document.getElementById("alertScore").style.display = "none";  
+    }
+  }
+}, 100);
+
 
 /* util_점수 팝업*/
 function showScorePopup(amount) {
@@ -559,9 +573,9 @@ function draw() {
       const nextStage = gameState.stageOrder[currentIdx + 1];
 
       let requiredScore = 0;
-      if (gameState.stage === "easy") requiredScore = 100;
-      else if (gameState.stage === "medium") requiredScore = 200;
-      else if (gameState.stage === "hard") requiredScore = 400;
+      if (gameState.stage === "easy") requiredScore = MAXEASY;
+      else if (gameState.stage === "medium") requiredScore = MAXMEDIUM;
+      else if (gameState.stage === "hard") requiredScore = MAXHARD;
 
       if (currentIdx < gameState.stageOrder.length - 1) {
         if(score >= requiredScore){
@@ -593,7 +607,7 @@ function draw() {
         const happy = document.getElementById("happy-ending");
         const sad = document.getElementById("sad-ending");
 
-        if (score >= 500) {
+        if (score >= MAXHARD) {
           happy.style.display = "flex";
           const lines = happy.querySelectorAll("p");
           lines.forEach((line, i) => {
@@ -1249,17 +1263,3 @@ document.body.addEventListener("click", (e) => {
     location.reload();
   }
 });
-
-/* 점수 하한선 설정 */
-setInterval(() => {
-  if (score < BASICSCORE) {
-    score = BASICSCORE;
-    console.log("score가 너무 낮아서 100으로 조정됨");
-    document.getElementById("alertScore").style.display = "flex";
-
-    document.getElementById("alertConfirm").onclick = () => {
-      document.getElementById("alertScore").style.display = "none";
-      
-    }
-  }
-}, 100);
