@@ -1,71 +1,61 @@
-/*
-  파일명: style.css
-  작성자: 정해찬
-  작성일: 2025-05-24
-  설명: A, B, C 수합
-*/
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
 
-/* === 기본 전체 레이아웃 설정 === */
 html, body {
   margin: 0;
   padding: 0;
   height: 100%;
-  font-family: 'Arial', sans-serif;
-  background-color: #f0f0f0;
-  overflow: hidden;
+  background: linear-gradient(to bottom, #FFE4F0, white);
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 #game-container {
   display: none;
-  width: 100%;
-  height: 100%;
+  width: 80vw;
+  height: 80vh;
+  align-items: center;
 }
 
-/* === A: 캔버스 영역 - 좌측 (60%) === */
 #gameCanvas {
-  display: block;
-  background-color: #000;
-  border-right: 2px solid #ccc;
+  display: none;
+  background-color: white;
   flex-shrink: 0;
-  margin: auto 0;
 }
 
-/* === B: UI 패널 - 우측 (40%) === */
 #uiPanel {
-  flex: 0 0 40%;
-  width: 40%;
-  padding: 20px;
+  display: none;
+  height: 100%;
+  background-color: white;
   box-sizing: border-box;
-  background-color: #fff;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-}
-
-#stageTitle {
-  font-weight: bold;
-  margin-bottom: 15px;
+  overflow: hidden;
+  position: relative;
 }
 
 #uiContent {
+  display: flex;
+  justify-content: center;
+  align-items: center;  
+  height: 100%;  
   flex-grow: 1;
-  background-color: #eee;
   border: 1px solid #ccc;
-  margin-bottom: 10px;
   overflow-y: auto;
+  position: relative;
 }
 
 #puzzle-board {
   display: grid;
-  width: 262px;
-  height: 262px;
-  margin: 50px auto;
-  padding: 5px;
+  width: 80%;
+  aspect-ratio: 1 / 1;  
   background-color: #ddd;
   border: 1px solid #ccc;
   grid-template-columns: repeat(3, 1fr);
   grid-template-rows: repeat(3, 1fr);
-  gap: 5px;
+  gap: 0px;
 }
 
 #puzzle-board img {
@@ -77,6 +67,15 @@ html, body {
 
 #endMessage.hidden {
   display: none;
+}
+
+#startButton {
+  width: 100%;
+  padding: 10px;
+  background-color: #3b82f6;
+  color: #fff;
+  border: none;
+  cursor: pointer;
 }
 
 #talk-box {
@@ -144,16 +143,17 @@ html, body {
 
 .sent-content {
   position: absolute;
-  width: 200px;
+  width: 230px;
   height: auto;
   bottom: 10px;
-  left: 40px;
+  left: 20px;
   z-index: 3;
+  font-size: 14px;
 }
 
 .reply {
   position: absolute;
-  width: 60px;
+  width: 230px;
   height: 50px;
   bottom: 0;
   left: 0;
@@ -161,7 +161,7 @@ html, body {
 
 .reply-chat-img {
   position: absolute;
-  width: 60px;
+  width: 220px;
   height: auto;
   bottom: 0;
   left: 3px;
@@ -170,11 +170,12 @@ html, body {
 
 .reply-line {
   position: absolute;
-  width: 30px;
+  width: 200px;
   height: auto;
   bottom: 10px;
   left: 20px;
   z-index: 3;
+  font-size: 14px;
 }
 
 @keyframes fadeInUp {
@@ -185,31 +186,15 @@ html, body {
   animation: fadeInUp 0.4s ease-out;
 }
 
-#emotion-graph {
-  position: relative;
-  overflow: hidden;
-  height: 160px;
-  width: 300px;
-  margin: 200px auto;
-  background-color: black;
-  z-index: 1;
-}
-
-#graph-video {
+#heart-wrapper {
   position: absolute;
-  top: 20px;
-  left: 0;
-  width: 70%;
-  height: auto;
-  object-fit: cover;
-  pointer-events: none;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
 }
 
 #heart {
-  position: absolute;
-  top: 45px;
-  right: 30px;
-  width: 80px;
+  width: 180px;
   height: auto;
   transform-origin: center center;
   animation-name: pulse;
@@ -218,18 +203,16 @@ html, body {
 }
 
 @keyframes pulse {
-  0% {transform: scale(0.6);}
-  50% {transform: scale(1.3);}
-  100% {transform: scale(1);}
+  0%   { transform: scale(var(--scale-min, 0.6)); }
+  50%  { transform: scale(var(--scale-max, 1.3)); }
+  100% { transform: scale(1); }
 }
 
-/* 채팅 메시지 테스트용입니다. 디자인 완료 시 지워주세요 */
 .chat-line-user {
- position: relative;
+  position: relative;
   z-index: 10; 
 }
 
-/* === C: hard 모드 canvas 흔들림 효과 ===*/
 @keyframes canvasShake {
   0%   { transform: translate(0, 0); }
   20%  { transform: translate(var(--shake-x, 2px), var(--shake-y, 2px)); }
@@ -243,83 +226,974 @@ canvas.shaky {
   animation: canvasShake 0.3s infinite;
 }
 
-/* === D: 버튼 및 사용자 설정 === */
-#startButton {
+#settingButton {
   width: 400px;
   height: auto;
   max-width: 100%;
   padding: 10px;
   object-fit: contain;
-  /* background-color: #3b82f6; */
-  /* color: #fff; */
-  /* border: 1px solid black; */
-  /* border-bottom: none; */
   cursor: pointer;
 }
-#startButton:hover{
-  background-color: #002d71;
-  /* color: #3b82f6; */
-}
 
-#settingButton {
-  width: 100px;
-  height: auto;
-  max-width: 100%;
-  padding: 10px;
-  object-fit: contain;
-
-  /* background-color: #3b82f6; */
-  /* color: #fff; */
-  /* border: 1px solid black; */
-  cursor: pointer;
-}
 #settingButton:hover{
   background-color: #002d71;
-  /* color: #3b82f6; */
 }
-
-#stage {
-  width: 500px;
-  /* margin: 0 auto; */
-}
-
-#gameStart {
-  width: 300px;
-}
-
-#etcBtn {
-  position: fixed;   
-  bottom: 20px;      
-  right: 20px;        
-  z-index: 1000;
-}
-
-#initView {
-  width: 100%;
-  height: 100vh;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 40px;
-  background-color: white;
-}
-
-#game-setting {
-  display: none;
+#settingButton:hover{
+   background-color: #002d71;
 }
 
 #firstStory {
   display: none;
 }
 
+#fullscreen-exit-overlay {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background-color: rgba(0,0,0,0.8);
+  color: white;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  z-index: 9999;
+}
+
+#fullscreen-exit-overlay button {
+  margin-top: 20px;
+  padding: 16px 32px;
+  font-size: 20px;
+  cursor: pointer;
+}
+
+ .settingContainer {
+  position: relative;
+  width: 600px;
+  height: 250px;
+  margin: 20px auto;
+  text-align: center;
+  background-color: white;
+  border: 5px solid gray;
+  text-align: center;
+  overflow: hidden;
+}
+
+.settingContainer .mainImage {
+  display: block;
+  margin: 0 auto;
+  object-fit: cover;
+}
+
+#blockImg {
+  width: 200px;
+  height: auto;
+  margin: 20px auto;
+}
+
+#bgmImg {
+  width: 100px;
+  height: auto;
+  margin: 50px auto;
+}
+
+#musicSettingImg {
+  width: 100px;
+  height: auto;
+  margin: 50px auto;
+}
+
+#keySettingImg {
+  width: 300px;
+  height: auto;
+}
+
+#gameStart {
+  width: 300px;
+}
+
+#blockImg {
+  width: 200px;
+  height: auto;
+  margin: 20px auto;
+}
+
+#bgmImg {
+  width: 100px;
+  height: auto;
+  margin: 50px auto;
+}
+
+#musicSettingImg {
+  width: 100px;
+  height: auto;
+  margin: 50px auto;
+}
+
+#keySettingImg {
+  width: 300px;
+  height: auto;
+}
+
+.settingContainer h3 {
+  margin: 20px 20px 0 20px;
+  font-size: 20px;
+}
+
+#return {
+  margin: 20px;
+  font-size: 20px;
+  background-color: white;
+}
+
+#start-btn {
+  background-color: #FFD6EA;
+  color: #fff;
+  font-size: 30px;
+  padding: 8px 20px;
+  border: 4px solid white;
+  border-radius: 50px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  text-shadow:
+    0 2px 4px rgba(255, 105, 180, 1),
+    0 0 6px rgba(255, 105, 180, 0.6),
+    1px 1px 0 rgba(255, 64, 129, 0.8);
+  font-family: "Nanum Pen Script", cursive;
+  cursor: pointer;
+  transition: 0.3s ease;
+}
+
+#start-btn:hover {
+  background-color: #FBCFE8;
+  transform: scale(1.05);
+}
+
+.main-title {
+  font-size: 50px;
+  color: #C45C9B;
+  text-align: center;
+  margin-bottom: 20px;
+  font-family: "Gamja Flower", sans-serif;
+}
+
+#initView {
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(255, 192, 203, 0.3);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+}
+
+.modal.hidden {
+  display: none;
+}
+
+.modal-box {
+  background: #FFF0F5;
+  border-radius: 20px;
+  padding: 24px 32px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+  text-align: center;
+  animation: fadeIn 0.4s ease;
+}
+
+.modal-title {
+  font-family: 'Gamja Flower', cursive;
+  font-size: 22px;
+  color: #C45C9B;
+  margin-bottom: 12px;
+}
+
+.modal-body {
+  font-family: 'Gowun Dodum', sans-serif;
+  font-size: 16px;
+  margin-bottom: 20px;
+}
+
+.modal-btn {
+  background: #FFB7CE;
+  color: white;
+  padding: 10px 24px;
+  border: none;
+  border-radius: 30px;
+  font-size: 16px;
+  cursor: pointer;
+  box-shadow: 0 4px 8px rgba(255, 105, 180, 0.3);
+}
+
+.reload {
+  margin-top: 30px;
+  background: none;
+  border: none;
+  color: #888;
+  font-size: 16px;
+  text-decoration: underline;
+  cursor: pointer;
+  z-index: 999;
+}
+
+#settingButton {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: #FFE8F1;
+  border: none;
+  border-radius: 50%;
+  width: 48px;
+  height: 48px;
+  font-size: 22px;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+#settingButton:hover {
+  background: #FFD6EA;
+  transform: rotate(20deg);
+}
+
 #select-page {
   display: none;
-  width: 100%;
-  height: 100vh;
-  position: fixed;
-  background-color: white;
-
   flex-direction: column;
   align-items: center;
   justify-content: center;
+
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+
+  width: 90vw;
+  height: 85vh;
+  background-color: white;
+  border-radius: 32px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  z-index: 100;
+  padding: 50px 30px;
+  box-sizing: border-box;
 }
+
+#stage {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+.difficulty-title {
+  font-family: 'Gamja Flower', cursive;
+  font-size: 38px;
+  color: #C45C9B;
+  margin-bottom: 50px;
+  text-align: center;
+}
+
+.stage {
+  width: 300px;
+  padding: 20px;
+  margin: 16px 0;
+  font-size: 22px;
+  font-family: 'Gowun Dodum', sans-serif;
+  border: none;
+  border-radius: 18px;
+  cursor: pointer;
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.08);
+  transition: 0.2s ease;
+}
+
+.stage:nth-child(2) { background: #FFE8F1; color: #C45C9B; }
+.stage:nth-child(3) { background: #D6F0FF; color: #4279B3; }
+.stage:nth-child(4) { background: #E6D6FA; color: #5E3793; }
+
+.stage:hover {
+  transform: scale(1.06);
+}
+
+#settingButton {
+  position: absolute;
+  top: 24px;
+  right: 24px;
+
+  width: 72px;
+  height: 72px;
+  background: none;
+  border: none;
+  font-size: 40px;
+  cursor: pointer;
+  color: #A98ECF;
+  transition: transform 0.3s ease;
+}
+
+#settingButton:hover {
+  transform: rotate(25deg) scale(1.1);
+}
+
+.homeButton {
+  position: absolute;
+  top: 24px;
+  right: 24px;
+  background: none;
+  border: none;
+  font-size: 34px;
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+
+.homeButton:hover {
+  transform: scale(1.2);
+}
+
+#game-setting {
+  display: none;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 90vw;
+  min-height: 90vh;
+  background: white;
+  border-radius: 32px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  padding: 40px;
+  box-sizing: border-box;
+  font-family: 'Gowun Dodum', sans-serif;
+  overflow: hidden;
+}
+
+.gridWrapper {
+  display: flex;
+}
+
+.settingGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 32px;
+  justify-content: center;
+  align-items: center;
+  height: auto;
+  padding: 10px;
+  box-sizing: border-box;
+}
+
+.settingContainer h3 {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  font-size: 32px;
+  color: #FF8BA7;
+  font-family: 'Gamja Flower', cursive;
+  text-align: center;
+  margin-bottom: 18px;
+  font-weight: bold;
+  letter-spacing: 1px;
+  text-shadow:
+    -2px -2px 0 #fff,
+     2px -2px 0 #fff,
+    -2px  2px 0 #fff,
+     2px  2px 0 #fff;
+}
+
+.settingContainer {
+  position: relative;
+  width: 100%;
+  max-width: 440px;
+  background: white;
+  border: 2px solid #DAB6F7;
+  border-radius: 28px;
+  box-shadow: 0 8px 18px rgba(203, 160, 247, 0.2);
+  padding: 10px 8px;
+  box-sizing: border-box;
+  justify-content: center;
+  height: 100%;
+}
+
+.settingContent {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+}
+
+.settingContainer .leftArrow,
+.settingContainer .rightArrow {
+  position: absolute;
+  top: 50%;
+  width: 32px;
+  height: 32px;
+  cursor: pointer;
+  opacity: 0.8;
+  transition: transform 0.2s ease;
+}
+
+.leftArrow {
+  left: 0;
+}
+
+.rightArrow {
+  right: 0;
+}
+
+.settingContainer .leftArrow:hover,
+.settingContainer .rightArrow:hover {
+  transform: scale(1.1);
+  opacity: 1;
+}
+
+.settingContainer .mainImage {
+  width: 100px;
+  height: auto;
+  background-color: #FFF8FC;
+  border-radius: 20px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+}
+
+.colorCircle {
+  display: inline-block;
+  vertical-align: middle;
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  border: 4px solid #fff;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+  background-color: #FFE4F0;
+}
+
+#scorePanel {
+  position: absolute;
+  z-index: 999;
+  top: 15px;
+  left: 15px;
+  display: flex;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.9);
+  padding: 12px 20px;
+  border-radius: 20px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  font-family: 'Gowun Dodum', sans-serif;
+}
+
+#scoreInfo {
+  font-size: 15px;
+  font-weight: bold;
+  color: #ff6b81;
+  margin-right: 15px;
+}
+
+#characterImg {
+  width: 40px;
+  height: 40px;
+  object-fit: contain;
+  background-color: #fff;
+}
+
+#profileBoxFancy {
+  position: absolute;
+  top: 40px;
+  left: 40px;
+  width: 250px;
+  background: linear-gradient(145deg, #fff0f5, #ffffff);
+  border-radius: 28px;
+  box-shadow: 0 15px 40px rgba(255, 173, 196, 0.4);
+  padding: 24px 18px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  z-index: 10;
+  font-family: 'SUIT', sans-serif;
+  animation: fadeInFancy 1.3s ease-out;
+  overflow: hidden;
+}
+
+.profile-img-container {
+  width: 110px;
+  height: 110px;
+  border-radius: 50%;
+  background: radial-gradient(circle, #ffe4ec, #fff0f8);
+  padding: 8px;
+  box-shadow: 0 0 18px rgba(255, 182, 193, 0.6);
+  margin-bottom: 14px;
+  transition: transform 0.3s ease;
+}
+
+#profileImgFancy {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: contain;
+  filter: drop-shadow(0 0 8px rgba(255, 192, 203, 0.7));
+}
+
+.profile-info-fancy {
+  text-align: center;
+}
+
+.profile-name-fancy {
+  font-weight: 800;
+  color: #ff3e7f;
+  font-size: 20px;
+  margin-bottom: 6px;
+  position: relative;
+}
+
+.profile-name-fancy::after {
+  content: "💖";
+  font-size: 16px;
+  margin-left: 6px;
+  animation: heartbeat 1.8s infinite ease-in-out;
+}
+
+.profile-score-fancy {
+  font-size: 16px;
+  font-weight: 500;
+  color: #444;
+  margin-bottom: 10px;
+}
+
+.profile-desc-fancy {
+  font-size: 14px;
+  color: #777;
+  line-height: 1.5;
+  padding-top: 10px;
+  border-top: 1px dashed #ffdce5;
+  margin-top: 10px;
+}
+
+#ending-page {
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+
+  width: 90vw;
+  height: 85vh;
+  background: linear-gradient(to bottom right, #fff6fb, #ffffff); /* 부드러운 배경 */
+  border-radius: 32px;
+  box-shadow: 0 10px 40px rgba(255, 190, 235, 0.25);
+  z-index: 100;
+  padding: 60px 40px;
+  box-sizing: border-box;
+  font-family: 'Gowun Batang', serif;
+  text-align: center;
+  overflow-y: auto;
+}
+
+#happy-ending,
+#sad-ending {
+  display: none;
+  flex-direction: column;
+  gap: 20px;
+  font-size: 2.2rem;
+  color: #444;
+  line-height: 1.8;
+  animation: fadeInFancy 1s ease-out forwards;
+}
+
+#ending-page p {
+  opacity: 0;
+  animation: fadeInFancy 0.8s ease-out forwards;
+}
+
+#happy-ending p:nth-child(1),
+#sad-ending p:nth-child(1) { animation-delay: 0.3s; }
+#happy-ending p:nth-child(2),
+#sad-ending p:nth-child(2) { animation-delay: 0.6s; }
+#happy-ending p:nth-child(3),
+#sad-ending p:nth-child(3) { animation-delay: 0.9s; }
+#happy-ending p:nth-child(4),
+#sad-ending p:nth-child(4) { animation-delay: 1.2s; }
+
+.ending-final-line.ending-highlight {
+  color: #ff4d8a;
+  font-weight: bold;
+  font-size: 3rem;
+  text-shadow: 0 0 8px rgba(255, 100, 150, 0.2);
+}
+
+.ending-final-line.ending-sad {
+  color: #5577cc;
+  font-weight: bold;
+  font-size: 2.8rem;
+  text-shadow: 0 0 8px rgba(80, 120, 180, 0.2);
+}
+
+@keyframes fadeInFancy {
+  0% {
+    opacity: 0;
+    transform: translateY(40px) scale(0.92);
+    filter: blur(4px);
+  }
+  60% {
+    opacity: 0.8;
+    transform: translateY(-8px) scale(1.02);
+    filter: blur(1px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    filter: blur(0);
+  }
+}
+
+#character-floating-group {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100vh;
+  pointer-events: none;
+  z-index: 20;
+}
+
+.char1 {
+  position: absolute;
+  bottom: 7%;
+  left: 10%;
+  width: 180px;
+  opacity: 1;
+  animation: float 4s ease-in-out infinite;
+  filter: drop-shadow(0 0 25px rgba(255, 200, 255, 0.8));
+  z-index: 2;
+}
+
+.char2 {
+  position: absolute;
+  bottom: 7%;
+  right: 45%;
+  transform: translateX(-50%);
+  width: 180px;
+  opacity: 1;
+  animation: float 5s ease-in-out infinite;
+  filter: drop-shadow(0 0 30px rgba(255, 170, 255, 0.85));
+  z-index: 2;
+}
+
+.char3 {
+  position: absolute;
+  bottom: 7%;
+  right: 10%;
+  width: 200px;
+  opacity: 1;
+  animation: float 4.5s ease-in-out infinite;
+  filter: drop-shadow(0 0 20px rgba(255, 220, 255, 0.75));
+  z-index: 2;
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-12px);
+  }
+}
+
+#score-popup {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 4rem;
+  font-weight: bold;
+  color: #ff4d8a;
+  opacity: 0;
+  pointer-events: none;
+  z-index: 999;
+  text-shadow: 0 0 10px rgba(255, 100, 150, 0.4);
+}
+
+#score-popup-negative {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 4rem;
+  font-weight: bold;
+  color: #000080;
+  opacity: 0;
+  pointer-events: none;
+  z-index: 999;
+  text-shadow: 0 0 10px rgba(255, 100, 150, 0.4);
+}
+
+@keyframes popupScore {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.5);
+  }
+  30% {
+    opacity: 1;
+    transform: translate(-50%, -60%) scale(1.2);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -80%) scale(1);
+  }
+}
+
+.score-show {
+  animation: popupScore 1.2s ease-out forwards;
+}
+
+#score-guide-popup {
+  position: fixed;
+  top: 30px;
+  right: 30px;
+  background: white;
+  border: 2px solid #ffddee;
+  border-radius: 12px;
+  padding: 12px 16px;
+  font-size: 0.95rem;
+  box-shadow: 0 0 12px rgba(255, 180, 220, 0.2);
+  font-family: 'Gowun Dodum', sans-serif;
+  z-index: 999;
+  color: #444;
+  line-height: 1.6;
+}
+
+.color-box {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  margin-right: 8px;
+  vertical-align: middle;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+}
+
+.color-box.high   { background-color: #cce0ff; }
+.color-box.medium { background-color: #fff9c4; }
+.color-box.low    { background-color: #ffe0e0; }
+
+#confession-guide-popup {
+  position: fixed;
+  top: 50px;
+  right: 50px;
+
+  background: #fff3f8;
+  color: #C44572;
+  border: 2px solid #ffc6da;
+  border-radius: 14px;
+  padding: 14px 18px;
+  font-size: 0.95rem;
+  line-height: 1.6;
+  box-shadow: 0 0 12px rgba(255, 120, 160, 0.2);
+  font-family: 'Gowun Dodum', sans-serif;
+  z-index: 999;
+  animation: fadeIn 0.6s ease-out;
+}
+
+#confession-guide-popup .highlight {
+  color: #ff4d8a;
+  font-weight: bold;
+}
+
+.stage-subtitle {
+  font-size: 16px;
+  color: #888;
+  font-family: 'Gowun Dodum', sans-serif;
+  margin-top: 6px;
+  margin-bottom: 24px;
+  text-align: center;
+  line-height: 1.6;
+  opacity: 0.85;
+  transition: all 0.3s ease;
+}
+
+.stage-option:hover .stage-subtitle {
+  color: #ff66a3;
+  transform: scale(1.03);
+}
+
+#admin-score-modal {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: #fff0f5;
+  border: 2px solid #ffb6c1;
+  border-radius: 18px;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+  padding: 24px 32px;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+#admin-score-modal.hidden {
+  display: none;
+}
+
+#admin-score-modal h3 {
+  font-family: 'Gamja Flower', cursive;
+  color: #d83c7d;
+  font-size: 24px;
+  margin-bottom: 12px;
+}
+
+#admin-score-input {
+  padding: 10px;
+  font-size: 16px;
+  width: 120px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  text-align: center;
+  margin-bottom: 10px;
+}
+
+#admin-score-submit {
+  padding: 8px 16px;
+  font-size: 16px;
+  background-color: #ff85b3;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+#firstStory {
+  display: none;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  gap: 40px;
+  padding: 40px;
+  width: 100vw;
+  height: 100vh;
+  box-sizing: border-box;
+  font-family: 'Gowun Batang', serif;
+}
+
+#intro {
+  background-color: white;
+  border-radius: 24px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+  padding: 30px;
+  font-size: 20px;
+  font-weight: bold;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  align-items: center;
+  justify-content: center;
+
+  width: 60vw;
+  height: 80vh;
+}
+
+/* 강조 색 */
+.highlight {
+  color: #b03a5b;
+}
+
+/* 마지막 문장 강조 */
+.last {
+  font-size: 22px;
+  font-weight: bold;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+
+#tutorial {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+
+  background-color: white;
+  border-radius: 24px;
+  padding: 30px;
+  font-size: 18px;
+  overflow: hidden;
+  width: 35vw;
+  height: 80vh;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+  font-weight: bold;
+}
+
+#tutorial h3{
+  color: #b03a5b;
+}
+
+#tutorial h2,h3 {
+  margin-bottom: 20px;
+  font-family: 'Gowun Batang', serif;
+}
+
+.tutorial-slide {
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 10px;
+}
+
+.tutorial-slide.active {
+  display: flex;
+}
+
+.character-row {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 16px;
+  margin: 12px 0;
+}
+
+.character-img {
+  width: 100px;
+  height: auto;
+  border-radius: 12px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+}
+
+.tutorial-img {
+  width: 100%;
+  max-width: 400px;
+  height: auto;
+  border-radius: 16px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+.arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 32px;
+  cursor: pointer;
+  user-select: none;
+  z-index: 2;
+}
+
+.arrow.left {
+  left: 10px;
+}
+
+.arrow.right {
+  right: 10px;
+}
+

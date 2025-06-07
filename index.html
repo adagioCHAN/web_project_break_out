@@ -1,10 +1,3 @@
-<!--
-  파일명: index.html
-  작성자: 정해찬
-  작성일: 2025-05-24
-  설명: A, B, C 수합
--->
-
 <!DOCTYPE html>
 <html lang="ko">
 <head>
@@ -12,51 +5,227 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>짝사랑 시뮬레이터</title>
   <link rel="stylesheet" href="css/style.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Gamja+Flower&family=Nanum+Pen+Script&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Gamja+Flower&family=Gowun+Dodum&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Gamja+Flower&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Nanum+Gothic&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Gowun+Batang&display=swap" rel="stylesheet">
+
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 </head>
 <body>
+  <audio id = "bgm" src="assets/audio/bgm1.mp3" autoplay loop muted></audio>
+
+  <div id="admin-score-modal" class="hidden">
+    <div class="admin-score-box">
+      <h3>관리자 점수 설정</h3>
+      <input id="admin-score-input" type="number" placeholder="예: 100" />
+      <button id="admin-score-submit">적용</button>
+    </div>
+  </div>
+
+  <div id="fullscreen-exit-overlay">
+    <div>전체화면이 종료되었습니다.</div>
+    <button onclick="reenterFullscreen()">다시 전체화면으로 전환</button>
+  </div>
+
+  <div id="fullscreen-modal" class="modal hidden">
+    <div class="modal-box">
+      <p class="modal-title">전체화면 안내</p>
+      <p class="modal-body">진정한 사랑을 찾기 위해 전체화면으로 전환됩니다.</p>
+      <button id="modal-ok" class="modal-btn">확인</button>
+    </div>
+  </div>
+
+    <div id="alertScore" class="modal hidden">
+    <div class="modal-box">
+      <p class="modal-title">점수 조정 안내</p>
+      <P class="modal-body">score가 너무 낮아 100점으로 조정되었습니다.</p>
+      <button id="alertConfirm" class="modal-btn">확인</button>
+    </div>  
+  </div>
+  
   <div id="initView">
-    <img src="assets/img/gameStartIMG.png" id="startButton">
-    <!-- 게임 세팅 버튼 게임 시작 이후로 변경 -->
-    <!-- <img src="assets/img/GameSettingIMG.png" id="settingButton"> -->
-  </div>
+    <div id="character-floating-group">
+      <img src="assets/img/char_1.png" class="char1" />
+      <img src="assets/img/char_2.png" class="char2" />
+      <img src="assets/img/char_3.png" class="char3" />
+    </div>
 
-  <div id="firstStory">
-    <p>story</p>
-    <!-- 초기 스토리 -->
-  </div>
-
-  <div id="select-page">
-    <!-- 난이도 선택 버튼, 게임 설정 버튼 페이지 -->
-     <div id="stage">
-      <img src="assets/img/easyBtn.png" id="gameStart">
-      <img src="assets/img/normalBtn.png" id="gameStart">
-      <img src="assets/img/hardBtn.png" id="gameStart">
-     </div>
-     <div id="etcBtn">
-      <img src="assets/img/GameSettingIMG.png" id="settingButton">
-      <button id="reload">돌아가기</button>
-     </div>
+    <h1 class="main-title">짝사랑을 성공시킬 준비가 되었나요?</h1>
+    <button id="start-btn">💌 게임 시작</button>
   </div>
 
   <div id="game-setting">
-    <!-- game setiing 페이지 -->
-     <button id="return">돌아가기</button>
+    <button class="homeButton" onclick="goHome();">↩︎</button>
+    <h3>게임설정</h3>
+
+    <div class="girdWrapper">
+      <div class="settingGrid">
+       <div id = "bgThema" class="settingContainer">
+          <h3>배경 스타일</h3>
+          <div class="settingContent">
+            <img class="leftArrow" src="assets/img/leftArrow.png">
+            <div id="bgImgCircle" class="colorCircle"></div>
+            <img class="rightArrow" src="assets/img/rightArrow.png">
+          </div>
+       </div>
+
+       <div id = "bgmImage" class="settingContainer">
+         <h3>배경 음악</h3>
+         <div class="settingContent">
+          <img class="leftArrow" src="assets/img/leftArrow.png">
+          <img id="bgmImg" class="mainImage" src="assets/img/bgmImg1.png">
+          <img class="rightArrow" src="assets/img/rightArrow.png">
+        </div>
+       </div>
+
+       <div id = "musicSetting" class="settingContainer">
+        <h3>음악 소리 켜기/끄기</h3>
+        <div class="settingContent">
+          <img class="leftArrow" src="assets/img/leftArrow.png">
+          <img id="musicSettingImg" class="mainImage" src="assets/img/musicSetting1.png">
+          <img class="rightArrow" src="assets/img/rightArrow.png">
+        </div>
+       </div>
+
+       <div id="keySetting" class="settingContainer" >
+        <h3>플레이어 키 설정</h3>'
+        <div class="settingContent">
+          <img class="leftArrow" src="assets/img/leftArrow.png">
+          <img id="keySettingImg" class="mainImage" src="assets/img/keySetting1.png">
+          <img class="rightArrow" src="assets/img/rightArrow.png">
+        </div>
+       </div>
+     </div>
+   </div>
+ </div>
+
+  <div id="firstStory">
+    <div id="intro">
+      <h1 style="color: #b03a5b;">💌 GAME STORY 💌</h1>
+      <p>당신은 짝사랑을 하던 그때 그 순간으로 왔습니다.</p>
+      <p class="highlight">짝사랑을 하는 당신은 처음에는 그 사람과의 순간을 회상하고</p>
+      <p class="highlight">용기를 내어 그 사람에게 연락도 하며</p>
+      <p class="highlight">넘치는 마음에 고백도 하게 될 것입니다.</p>
+      <p>꼭 당신의 사랑과 이루어지길 바랍니다.</p>
+      <p class="last">다만, 당신의 사랑과 좋은 결실을 맺기 위해선 벽돌깨기를 잘 해야 할 것 입니다.</p>
+      <p><i>tab 키를 눌러 skip</i></p>
+    </div>
+
+    <div id="tutorial">
+      <h2>🎮 튜토리얼 🎮</h2>
+      <div class="arrow left" onclick="prevTutorial()">⬅️</div>
+
+      <div class="tutorial-slide active" id="tutorial-basic">
+        <h3>기본 조작</h3>
+        <p>이 게임은 방향키 또는 wasd 키로 패들을 조작합니다.</p>
+        <p>패들을 움직이며 공을 이용해 벽돌을 깰 수 있습니다.</p>
+      </div>
+
+      <div class="tutorial-slide" id="tutorial-character">
+        <h3>캐릭터 진화</h3>
+        <div class="character-row">
+          <img src="assets/img/char_1.png" alt="캐릭터1" class="character-img">
+          <img src="assets/img/char_2.png" alt="캐릭터2" class="character-img">
+          <img src="assets/img/char_3.png" alt="캐릭터3" class="character-img">
+        </div>
+        <p>캐릭터는 하얀이 ⇀ 말랑이 ⇀ 사랑이 로 진화합니다.</p>
+        <p>각 스테이지를 차례대로 성공하여</p>
+        <p>캐릭터를 성장시키세요!</p>
+      </div>
+
+      <div class="tutorial-slide" id="tutorial-easy">
+        <h3>🌸 EASY – 생각만 해도 설레는</h3>
+        <img src="assets/img/tutorial-easy.png" alt="Easy Tutorial" class="tutorial-img">
+        <p>벽돌을 깨면서 첫 만남의 기억 퍼즐을 완성해야 합니다.</p>
+        <p>퍼즐을 완성시켜 연락 단계로 넘어가세요!</p>
+      </div>
+
+      <div class="tutorial-slide" id="tutorial-medium">
+        <h3>💌 MEDIUM – 용기 내어 말을 건네다</h3>
+        <img src="assets/img/tutorial-medium.png" alt="Medium Tutorial" class="tutorial-img">
+        <p>상대에게 연락이 오고,</p>
+        <p>대답 벽돌을 깨서 답장해야 합니다.</p>
+        <p>나쁨, 애매, 좋음 단계의 답장 벽돌이 존재합니다.</p>
+        <p>좋은 답장을 해 호감도를 높여 고백 단계로 넘어가세요!</p>
+      </div>
+
+      <div class="tutorial-slide" id="tutorial-hard">
+        <h3>🧠 HARD – 고백, 마음을 전하는 날</h3>
+        <img src="assets/img/tutorial-hard.png" alt="Hard Tutorial" class="tutorial-img">
+        <p>벽돌 사이에 붉은 고백 벽돌이 존재합니다.</p>
+        <p>고백 벽돌을 맞춰 고백하세요!</p>
+        <p>다만, 이른 고백은 나쁜 결과를 불러옵니다.</p>
+      </div>
+
+      <div class="arrow right" onclick="nextTutorial()">➡️</div>
+    </div>
   </div>
 
+  <div id="select-page">
+    <div id="profileBoxFancy">
+      <div class="profile-img-container">
+        <img id="profileImgFancy" src="assets/img/char_1.png" alt="char" />
+      </div>
+      <div class="profile-info-fancy">
+        <div class="profile-name-fancy">하얀이</div>
+        <div class="profile-score-fancy">호감도: <span id="profileScoreFancy">0</span></div>
+        <div class="profile-desc-fancy">짝사랑 상대가 자꾸 떠오르는 단계</div>
+      </div>
+    </div>
+
+     <div id="stage">
+      <h2 class="difficulty-title">💗 난이도 선택</h2>
+  
+      <button class="stage">🌸 생각만 해도 설레는 </button>
+      <p class="stage-subtitle">EASY 모드 | 짝사랑 상대를 떠올리며 조각을 맞춰보세요.</p>
+      <button class="stage">💌 용기 내어 말을 건네다</button>
+      <p class="stage-subtitle">NORMAL 모드 | 보낸 메시지에 알맞은 답장을 골라주세요.</p>
+      <button class="stage">🧠 고백, 마음을 전하는 날</button>
+      <p class="stage-subtitle">HARD 모드 | 고백에 성공하면 사랑이 이루어져요.</p>
+
+      <button class="reload">↩ 종료</button>
+      <button id="settingButton">⚙️</button>
+     </div>
+  </div>
+
+  <div id="ending-page">
+    <div id="happy-ending">
+      <p>안녕? 무슨 말부터 해야 할지...//</p>
+      <p>생각해 보니 너와의 첫 만남, 연락하던 순간, 그리고 네가 나에게 고백하기 위해</p> 
+      <p>벽돌을 깨던 모든 순간이 설레어서 잠도 설쳤어</p>
+      <p>이것이 사랑인 걸까...?</p>
+      <p class="ending-final-line">너의 고백에 대한 나의 대답은... 좋아! 나의 연인이 되어 줄래?</p>
+    </div>
+
+    <div id="sad-ending">
+      <p>???너무 당황스럽다;;</p>
+      <p>우리가 그런 사이나? 날 좋아하는 건 뭐 너의 자윤데</p> 
+      <p>이렇게 길 한복판에서 정장에 꽃 주며 공개 고백은 아니지...</p>
+      <p>벽돌 깨기 실력도 그저 그렇던데</p>
+      <p class="ending-final-line">너의 벽돌 깨기 실력을 다시 키워오든 포기하든 뭐 그렇게 해...</p>
+    </div>
+
+    <button class="reload">↩ 종료</button>
+  </div>
+
+  <div id="score-popup">+100</div>
+  <div id="score-popup-negative">-50</div>
+
   <div id="game-container">
-    
-    <!-- === A: Canvas 영역 === -->
-    <canvas id="gameCanvas" width="800" height="600" style="background-color: lightblue;"></canvas>
+    <canvas id="gameCanvas" width="800" height="600"></canvas>
 
-    <!-- === B: 우측 UI 패널 === -->
     <div id="uiPanel">
-      <div id="stageTitle">Stage: 처음 마주친 날</div>
-
-      <!-- === B: UI 콘텐츠 (퍼즐판, 채팅창, 그래프 등) === -->
       <div id="uiContent">
+        <div id="scorePanel">
+          <div id="scoreInfo">호감도: <span id="scoreValue">0</span></div>
+          <img id="characterImg" src="assets/img/char_1.png" alt="캐릭터" />
+        </div>
+
         <div id="puzzle-board">
-          <!-- 퍼즐 테두리 색상, 진행도 시각화 구현 예정 -->
           <img id="slot-0" class="slot" src="assets/img/gray.png" alt="">
           <img id="slot-1" class="slot" src="assets/img/gray.png" alt="">
           <img id="slot-2" class="slot" src="assets/img/gray.png" alt="">
@@ -71,20 +240,25 @@
           <img id="chat-box-img" src="assets\img\kakaotalk-box.png">
           <div id="chatting">
           </div>
+          <div id="score-guide-popup">
+            <strong>💡 점수 설명</strong>
+            <div><span class="color-box high"></span> 50점 (좋은 답변)</div>
+            <div><span class="color-box medium"></span> 30점 (애매한 답변)</div>
+            <div><span class="color-box low"></span> 0점 (나쁜 답변)</div>
+          </div>
         </div>
         <div id="emotion-graph">
-          <video id="graph-video" muted="muted" autoplay="autoplay" loop="loop">
-            <source src="assets\video\graph-video.mp4" type="video/mp4">
-            video 태그 지원 안함
-          </video>
-          <img id="heart" src="assets\img\heart.png">
+          <div id="heart-wrapper">
+            <img id="heart" src="assets\img\heart.png">
+          </div>
+          <div id="confession-guide-popup">
+            벽돌을 깨면 감정이 <span class="highlight">안정</span>돼요!<br>
+            <span class="highlight">고백 벽돌(빨간색)</span>을 깨면 <strong>게임 종료!!</strong>
+          </div>
         </div>
       </div>
 
-      <!-- === B: 완료 메시지 === -->
       <div id="endMessage" class="hidden">기억 완성!</div>
-
-      <!-- === D: 시작 버튼 및 설정 === -->
     </div>
   </div>
   <script src="js/script.js"></script>
