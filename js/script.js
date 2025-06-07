@@ -1,4 +1,4 @@
-/* === 캔버스 정의 === */
+/* 기본 캔버스 설정 */
 const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
 
@@ -29,8 +29,9 @@ function resizeCanvas() {
   uiPanel.style.width = `${containerWidth - canvasSize}px`;
   uiPanel.style.height = `${canvasSize}px`;
 }
-
 window.addEventListener("resize", resizeCanvas);
+
+/* 시작 설정_window load */
 window.addEventListener("load", () => {
   resizeCanvas();
   
@@ -51,12 +52,12 @@ window.addEventListener("load", () => {
   }
 });
 
-/* === 공통 게임 상태 관리 === */
+// 변수 및 상수
 const gameState = {
   stageOrder: ["easy", "medium", "hard"],
   stage:"easy",
   isRunning: false,
-  gameStatus: "PLAYING", // READY, PLAYING, GAME_OVER, STAGE_CLEAR, ENDING
+  gameStatus: "PLAYING",
   lives: 1,
   isDead: false,
   ballReadyToMove: false,
@@ -66,19 +67,19 @@ const gameState = {
   puzzleBoard: Array(9).fill(null),
   intensity: 5,
   confessionUnlocked: false,
-  confessionIndex: 13 // 고백 벽돌 관련 함수 구현 예정
+  confessionIndex: 13
 }
 
 const fixedColors = [ 
-  "#FFB3BA", // 파스텔 레드 (로맨틱 핑크빛)
-  "#B5EAD7", // 파스텔 민트 (포근한 초록)
-  "#AEC6FF", // 파스텔 블루 (맑고 부드러운 하늘)
-  "#FFFACD", // 파스텔 노랑 (연노랑, 희망)
-  "#F3C6E0", // 파스텔 자홍 (사랑, 로맨스)
-  "#CFF5F2", // 파스텔 청록 (상쾌한 감정)
-  "#FFD8A8", // 파스텔 오렌지 (따뜻함, 설렘)
-  "#D7B2FF", // 파스텔 보라 (감성, 신비로움)
-  "#E4EABF"  // 파스텔 올리브 (자연, 안정)
+  "#FFB3BA",
+  "#B5EAD7",
+  "#AEC6FF",
+  "#FFFACD",
+  "#F3C6E0",
+  "#CFF5F2",
+  "#FFD8A8",
+  "#D7B2FF",
+  "#E4EABF"
 ];
 
 const bgColors = [
@@ -101,14 +102,12 @@ const charGroup = [
   "assets/img/char_3.png"
 ]
 
-//점수 상수
 const BASICSCORE = 100;
 const MAXEASY = 150;
 const MAXMEDIUM = 300;
 const MAXHARD = 500;
 const FAILURESCORE = -50;
 
-// 게임 상태
 let isDead = false;
 let ballReadyToMove = false;
 let score = BASICSCORE;
@@ -137,15 +136,12 @@ const stageConfig = {
   }
 }
 
-/* === A: 게임 엔진 & 상태 관리 === */
-// 공
 let ballRadius = 10;
 let ballX = canvas.width / 2;
 let ballY = canvas.height-200;
 let ballDX = 2;
 let ballDY = -6;
 
-// 패들
 let paddleWidth = 120;
 let paddleHeight = 20;
 let paddleX = canvas.width/ 2;
@@ -153,11 +149,9 @@ let paddleY = canvas.height - paddleHeight + 30;;
 let paddleSpeed = 7;
 let paddleDX = 0;
 
-// 키 입력 상태
 let leftPressed = false;
 let rightPressed = false;
 
-// 벽돌
 let bricks = [];
 
 const stageSettings = {
@@ -167,15 +161,108 @@ const stageSettings = {
   },
   MEDIUM: {
     rows: 1, cols: 3, width: canvas.width / 6, height: canvas.height / 18, padding: 0,
-    offsetX: 0, offsetY: 0, ballSpeed: 5, ballRadius: 10, paddleWidth: 120
+    offsetX: 0, offsetY: 0, ballSpeed: 6, ballRadius: 10, paddleWidth: 120
   },
   HARD: {
-    rows: 3, cols: 6, width: canvas.width / 6, height: canvas.height / 18, padding: 0,
-    offsetX: 0, offsetY: 0, ballSpeed: 5, ballRadius: 10, paddleWidth: 120
+    rows: 2, cols: 6, width: canvas.width / 6, height: canvas.height / 27, padding: 0,
+    offsetX: 0, offsetY: 0, ballSpeed: 7, ballRadius: 10, paddleWidth: 120
   }
 };
 
-function Brick(x, y, type, index, textIdx) {//벽돌 정의: D파트 디자인 추가 예
+const mediumStageDialogs = [
+  {
+    question: "왜 갑자기 연락했어?",
+    options: [
+      { text: "그냥... 네 목소리가 듣고 싶었어", score: 50 },
+      { text: "할 말이 좀 있어서", score: 30 },
+      { text: "별건 아니야", score: 0 }
+    ]
+  },
+  {
+    question: "시간 있으면 나갈 거야?",
+    options: [
+      { text: "응! 당연하지, 너만 괜찮다면", score: 50 },
+      { text: "음... 너도 나갈 거라면", score: 30 },
+      { text: "아니, 그냥 물어봤어", score: 0 }
+    ]
+  },
+  {
+    question: "어제는 왜 그렇게 말했어?",
+    options: [
+      { text: "그땐 너한테 진심이었어", score: 50 },
+      { text: "그냥 기분이 이상했어", score: 30 },
+      { text: "그랬나?", score: 0 }
+    ]
+  },
+  {
+    question: "사람들이 너랑 나랑 친하대",
+    options: [
+      { text: "난 그 말 듣고 기분 좋았어", score: 50 },
+      { text: "그런가...? 난 잘 모르겠던데", score: 30 },
+      { text: "헐, 왜 그런 소문이...", score: 0 }
+    ]
+  },
+  {
+  question: "내가 갑자기 연락 안 해도 신경 써?",
+  options: [
+    { text: "매일 기다렸는데...", score: 50 },
+    { text: "조금은 신경 쓰였어", score: 30 },
+    { text: "아니? 괜찮았어", score: 0 }
+  ]
+}
+]
+
+const puzzleState = {
+  board: Array(stageConfig.easy.puzzleCount).fill(null)
+};
+
+/* util_점수 팝업*/
+function showScorePopup(amount) {
+  const popup = document.getElementById("score-popup");
+  popup.textContent = `+${amount}`;
+  popup.classList.remove("score-show");
+  void popup.offsetWidth;
+  popup.classList.add("score-show");
+}
+
+function showNegativeScorePopup(amount) {
+  const popup2 = document.getElementById("score-popup-negative");
+  popup2.textContent = `${amount}`;
+  popup2.classList.remove("score-show");
+  void popup2.offsetWidth;
+  popup2.classList.add("score-show");
+}
+
+/* screen_프로필 */
+function updateProfile(score) {
+  document.getElementById("profileScoreFancy").textContent = score;
+
+  let index = score >= 500 ? 2 : score >= 300 ? 1 : 0;
+  const names = ["하얀이", "말랑이", "사랑이"];
+  const descs = [
+    "짝사랑 상대가 자꾸 떠오르는 단계",
+    "밤마다 카톡으로 연락하는 단계",
+    "오늘은 꼭 고백해보고 싶은 설렘"
+  ];
+  document.getElementById("profileImgFancy").src = charGroup[index];
+  document.querySelector(".profile-name-fancy").textContent = names[index];
+  document.querySelector(".profile-desc-fancy").textContent = descs[index];
+}
+
+/* util_점수에 따른 업데이트 */
+function updateScore(score) {
+  document.getElementById("scoreValue").textContent = score;
+
+  let imgIndex = 0;
+  if (score >= 500) imgIndex = 2;
+  else if (score >= 300) imgIndex = 1;
+  else if (score >= 100) imgIndex = 0;
+
+  document.getElementById("characterImg").src = charGroup[imgIndex];
+}
+
+/* 벽돌 생성 및 배치 */
+function Brick(x, y, type, index, textIdx) {
   this.x = x;
   this.y = y;
   switch(gameState.stage){
@@ -244,39 +331,10 @@ function Brick(x, y, type, index, textIdx) {//벽돌 정의: D파트 디자인 �
 
   this.alive = true;
   this.type = type;
-  this.index = index; // easy 모드에서 사용할 벽돌 index
-  this.textIdx = textIdx; // medium 모드에서 사용할 벽돌 text의 인덱스
-
+  this.index = index;
+  this.textIdx = textIdx;
   this.color = fixedColors[this.index];
-
-  this.isConfession = false; // hard 모드에서 사용할 고백 벽돌
-}
-
-function updateScore(score) {
-  document.getElementById("scoreValue").textContent = score;
-
-  let imgIndex = 0;
-  if (score >= 500) imgIndex = 2;
-  else if (score >= 300) imgIndex = 1;
-  else if (score >= 100) imgIndex = 0;
-
-  document.getElementById("characterImg").src = charGroup[imgIndex];
-}
-
-function updateProfile(score) {
-  document.getElementById("profileScoreFancy").textContent = score;
-
-  let index = score >= 500 ? 2 : score >= 300 ? 1 : 0;
-  const names = ["하얀이", "말랑이", "사랑이"];
-  const descs = [
-    "짝사랑 상대가 자꾸 떠오르는 단계",
-    "밤마다 카톡으로 연락하는 단계",
-    "오늘은 꼭 고백해보고 싶은 설렘"
-  ];
-
-  document.getElementById("profileImgFancy").src = charGroup[index];
-  document.querySelector(".profile-name-fancy").textContent = names[index];
-  document.querySelector(".profile-desc-fancy").textContent = descs[index];
+  this.isConfession = false;
 }
 
 function getRandomInt(min, max) {
@@ -298,7 +356,7 @@ function generateBricks(stage) {
 
   if (stage.toUpperCase() === "HARD") {
     const totalBricks = s.rows * s.cols;
-    const confessionIndex = getRandomInt(0, totalBricks - 1); // 무작위로 고백 벽돌 위치 선정
+    const confessionIndex = getRandomInt(0, totalBricks - 1);
 
     for (let r = 0; r < s.rows; r++) {
       for (let c = 0; c < s.cols; c++) {
@@ -355,6 +413,7 @@ function generateBricks(stage) {
   }
 }
 
+/* 캔버스 게임 생성 */
 function applyStageSettings(stage) {
   const s = stageSettings[gameState.stage.toUpperCase()];
   if (!s) return;
@@ -368,51 +427,6 @@ function applyStageSettings(stage) {
 
   paddleY = canvas.height * 0.9;
 }
-
-// 키 이벤트
-document.addEventListener("keydown", function(e) {
-  const keySetting = settingContainerState.keySetting.current;
-  console.log(keySetting);
-
-  if(event.code == "Tab") {
-    event.preventDefault();
-    
-    let firstStory = document.getElementById("firstStory");
-    let selectPage = document.getElementById("select-page");
-    
-    if(firstStory.style.display == "flex") {
-      console.log("스토리 넘김");
-      firstStory.style.display = "none";
-      selectPage.style.display = "flex";
-    }
-  }
-
-  // 방향키 모드
-  if (keySetting == 1) {
-    if (e.key == "ArrowLeft") leftPressed = true;
-    if (e.key == "ArrowRight") rightPressed = true;
-  }
-
-  // WASD 모드
-  else if (keySetting == 2) {
-    if (e.key == "a" || e.key == "A") leftPressed = true;
-    if (e.key == "d" || e.key == "D") rightPressed = true;
-  }
-});
-
-document.addEventListener("keyup", function(e) {
-  const keySetting = settingContainerState.keySetting.current;
-
-  if (keySetting == 1) {
-    if (e.key == "ArrowLeft") leftPressed = false;
-    if (e.key == "ArrowRight") rightPressed = false;
-  }
-
-  else if (keySetting === 2) {
-    if (e.key == "a" || e.key == "A") leftPressed = false;
-    if (e.key == "d" || e.key == "D") rightPressed = false;
-  }
-});
 
 function drawBall() {
   ctx.beginPath();
@@ -430,7 +444,7 @@ function drawPaddle() {
   ctx.closePath();
 }
 
-function drawBricks() {//벽돌 출력: A파트 스테이지별 벽돌 배치 예정
+function drawBricks() {
   for (let i = 0; i < bricks.length; i++) {
     bricks[i].draw(ctx);
   }
@@ -441,11 +455,11 @@ function drawUI() {
   ctx.font = "16px 'Share Tech'";
 }
 
+/* 캔버스 충돌 판정 및 업데이트 */
 function collisionCheck() {
   for (let i = 0; i < bricks.length; i++) {
     const b = bricks[i];
 
-    // 벽돌 존재 & 공과 충돌
     if (b.alive &&
       ballX + ballRadius > b.x &&
       ballX - ballRadius < b.x + b.width &&
@@ -453,23 +467,19 @@ function collisionCheck() {
       ballY - ballRadius < b.y + b.height) {
       ballDY = -ballDY;
       b.alive = false;
-      onBrickHit(b); // 벽돌 충돌 후 함수 호출
+      onBrickHit(b);
 
       if (gameState.stage === "easy") {
         if (puzzleState.board.every(Boolean)) {
           gameStatus = "STAGE_CLEAR";
           ballDX = 0;
           ballDY = 0;
-          score += 100;
-          showScorePopup(100);
         }
       } else if (gameState.stage === "medium") {
         if (gameState.currentIndex >= mediumStageDialogs.length) {
           gameStatus = "STAGE_CLEAR";
           ballDX = 0;
           ballDY = 0;
-          score += mediumScore;
-          showScorePopup(mediumScore);
         } else {
           setTimeout(() => {
             generateBricks(gameState.stage);
@@ -479,23 +489,6 @@ function collisionCheck() {
     }
   }
 }
-
-function showScorePopup(amount) {
-  const popup = document.getElementById("score-popup");
-  popup.textContent = `+${amount}`;
-  popup.classList.remove("score-show"); // 재적용 위해 제거
-  void popup.offsetWidth;               // reflow 강제
-  popup.classList.add("score-show");
-}
-
-function showNegativeScorePopup(amount) {
-  const popup2 = document.getElementById("score-popup-negative");
-  popup2.textContent = `${amount}`;
-  popup2.classList.remove("score-show"); // 재적용 위해 제거
-  void popup2.offsetWidth;               // reflow 강제
-  popup2.classList.add("score-show");
-}
-
 
 function update() {
   paddleDX = leftPressed ? -paddleSpeed : rightPressed ? paddleSpeed : 0;
@@ -507,13 +500,11 @@ function update() {
     ballY += ballDY;
   }
 
-  // 천장, 벽 충돌
   if (ballX < ballRadius || ballX > canvas.width - ballRadius)
     ballDX = -ballDX;
   if (ballY < ballRadius)
     ballDY = -ballDY;
 
-  // 바닥 충돌
   if (!isDead && ballY + ballRadius >= canvas.height && gameStatus != "STAGE_CLEAR") {
     isDead = true;
     if (--lives == 0) gameStatus = "GAME_OVER";
@@ -521,30 +512,28 @@ function update() {
     ballDY = 0;
   }
 
-  // 패들 충돌
   if (
     ballY + ballRadius >= paddleY &&
     ballY <= paddleY + paddleHeight &&
     ballX + ballRadius >= paddleX &&
     ballX - ballRadius <= paddleX + paddleWidth
   ) {
-    const prevBallY = ballY - ballDY;  // 공의 이전 위치
+    const prevBallY = ballY - ballDY;
     const wasAbovePaddle = prevBallY + ballRadius <= paddleY;
 
     if (wasAbovePaddle) {
       ballDY = -ballDY;
     } else {
-      // 옆이나 아래 -> 아래로 튕김
       ballDX = -ballDX;
     }
 
-    // 충돌 후 공이 패들 안쪽으로 들어가지 않도록 위치 조정
     ballY = paddleY - ballRadius - 1;
   }
 
   collisionCheck();
 }
 
+/* 캔버스 draw */
 function draw() {
   if (gameStatus === "READY") return; 
   ctx.save();
@@ -562,12 +551,6 @@ function draw() {
 
   if (gameStatus == "PLAYING") update();
   else if (gameStatus == "STAGE_CLEAR") {
-  ctx.font = "24px 'Share Tech'";
-  ctx.textAlign = "center";
-  ctx.fillStyle = "#007";
-  ctx.fillText("Stage Clear!", canvas.width / 2, canvas.height / 2);
-  ctx.textAlign = "start";
-
   if (!draw.nextStageScheduled) {
     draw.nextStageScheduled = true;
 
@@ -576,12 +559,19 @@ function draw() {
       const nextStage = gameState.stageOrder[currentIdx + 1];
 
       let requiredScore = 0;
-      if (gameState.stage === "easy") requiredScore = 150;
-      else if (gameState.stage === "medium") requiredScore = 300;
-      else if (gameState.stage === "hard") requiredScore = 500;
+      if (gameState.stage === "easy") requiredScore = 100;
+      else if (gameState.stage === "medium") requiredScore = 200;
+      else if (gameState.stage === "hard") requiredScore = 400;
 
       if (currentIdx < gameState.stageOrder.length - 1) {
         if(score >= requiredScore){
+          if(gameState.stage == "easy"){
+            score += 100;
+            showScorePopup(100);
+          }else if(gameState.stage == "medium"){
+            score += mediumScore;
+            showScorePopup(mediumScore);
+          }
           gameState.stage = nextStage;
           generateBricks(gameState.stage);
           applyStageSettings(gameState.stage);
@@ -637,21 +627,19 @@ function draw() {
     setTimeout(() => {
       goHome();
       draw.goHomeTriggered = false;
-    }, 1000); // 1초 후 홈 이동
+    }, 1000);
   }
     console.log("hi");
  } 
- else if (gameStatus == "ENDING") {//엔딩 시 동작: D파트 엔딩 연출과 연결
+ else if (gameStatus == "ENDING") {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     if (!draw.endingTriggered) {
       draw.endingTriggered = true;
 
-      // 게임 관련 UI 숨김
       document.getElementById("game-container").style.display = "none";
       document.getElementById("uiPanel").style.display = "none";
       document.getElementById("gameCanvas").style.display = "none";
 
-      // 엔딩 페이지 표시
       const endingPage = document.getElementById("ending-page");
       const happy = document.getElementById("happy-ending");
       const sad = document.getElementById("sad-ending");
@@ -660,13 +648,13 @@ function draw() {
       happy.style.display = "none";
       sad.style.display = "none";
 
-      if (score >= 500) { // 호감도 500 이상일 때
+      if (score >= 500) {
         happy.style.display = "flex";
         const container = document.getElementById("happy-ending");
         const lines = container.querySelectorAll("p");
 
         lines.forEach((line, i) => {
-          line.style.animationDelay = `${i * 1.5}s`; // 0.6초 간격
+          line.style.animationDelay = `${i * 1.5}s`;
         });
       }else{
         sad.style.display = "flex";
@@ -674,7 +662,7 @@ function draw() {
         const lines = container.querySelectorAll("p");
 
         lines.forEach((line, i) => {
-          line.style.animationDelay = `${i * 1.5}s`; // 0.6초 간격
+          line.style.animationDelay = `${i * 1.5}s`;
         });
       }
     }
@@ -682,13 +670,11 @@ function draw() {
   ctx.restore();
 }
 
-/* === B: 우측 UI 출력 === */
+/* 오른쪽 ui 조작 */
 function updateStageView(stage) {
-  //모든 보드 숨기기
   $('#puzzle-board, #talk-box, #emotion-graph').hide();
   updateUI(stage);
 
-  //스테이지별로 필요한 UI만 보이기
   switch (stage) {
     case 'easy': {
       $('#puzzle-board').show();
@@ -705,7 +691,6 @@ function updateStageView(stage) {
   }
 }
 
-//게임오버되면 UI 리셋
 function updateUI(stage) {
   updateScore(score);
   switch (stage) {
@@ -714,8 +699,8 @@ function updateUI(stage) {
         $(`#slot-${i}`)
         .attr({"src":"assets/img/gray.png"})
         .css({
-          "border": "5px solid" + fixedColors[i],     // 원하는 색상/두께
-          "box-sizing": "border-box"       // 이미지 크기 유지
+          "border": "5px solid" + fixedColors[i],
+          "box-sizing": "border-box"
         });
         puzzleState.board[i] = null;
       }
@@ -741,148 +726,7 @@ function updateUI(stage) {
   }
 }
 
-//easy 스테이지
-function revealPuzzleImage(index) {
-  $(`#slot-${index}`).attr("src", `assets/img/puzzle-${index+1}.png`);
-}
-
-const mediumStageDialogs = [
-  {
-    question: "왜 갑자기 연락했어?",
-    options: [
-      { text: "그냥... 네 목소리가 듣고 싶었어", score: 50 },
-      { text: "할 말이 좀 있어서", score: 30 },
-      { text: "별건 아니야", score: 0 }
-    ]
-  },
-  {
-    question: "시간 있으면 나갈 거야?",
-    options: [
-      { text: "응! 당연하지, 너만 괜찮다면", score: 50 },
-      { text: "음... 너도 나갈 거라면", score: 30 },
-      { text: "아니, 그냥 물어봤어", score: 0 }
-    ]
-  },
-  {
-    question: "어제는 왜 그렇게 말했어?",
-    options: [
-      { text: "그땐 너한테 진심이었어", score: 50 },
-      { text: "그냥 기분이 이상했어", score: 30 },
-      { text: "그랬나?", score: 0 }
-    ]
-  },
-  {
-    question: "사람들이 너랑 나랑 친하대",
-    options: [
-      { text: "난 그 말 듣고 기분 좋았어", score: 50 },
-      { text: "그런가...? 난 잘 모르겠던데", score: 30 },
-      { text: "헐, 왜 그런 소문이...", score: 0 }
-    ]
-  },
-  {
-  question: "내가 갑자기 연락 안 해도 신경 써?",
-  options: [
-    { text: "매일 기다렸는데...", score: 50 },
-    { text: "조금은 신경 쓰였어", score: 30 },
-    { text: "아니? 괜찮았어", score: 0 }
-  ]
-}
-]
-
-function sendQuestion() {
-  setTimeout(() => {
-    $(".message").animate({bottom: "+=50px"}, 300);
-    var chatting = document.getElementById("chatting");
-    var container = document.createElement("div");
-    container.classList.add("message");
-
-    var replyContainer = document.createElement("div");
-    replyContainer.classList.add("reply", "new");
-
-    var replyDiv = document.createElement("div");
-    replyDiv.setAttribute("class", "reply-line");
-    replyDiv.textContent = mediumStageDialogs[gameState.currentIndex].question;
-    replyContainer.appendChild(replyDiv);
-  
-    var replyImg = document.createElement("img");
-    replyImg.setAttribute("class", "reply-chat-img");
-    replyImg.setAttribute("src", "assets/img/kakaotalk-reply.png");
-    replyContainer.appendChild(replyImg);
-
-    container.appendChild(replyContainer);
-    chatting.appendChild(container);
-  }, 1000)
-}
-
-//메시지 출력
-function sendMessage(message) {
-  for (let i=0; i < gameState.currentIndex; i++) {
-    $(".message").eq(i).animate({bottom: "+=50px"}, 300)
-    console.log(i);
-  }
-  $(".reply").eq(gameState.currentIndex).animate({bottom: "+=50px"}, 300);
-
-  var chatting = document.getElementById("chatting");
-  var container = $(".message").eq(gameState.currentIndex);
-  if (message == "") return;
-
-  var sentContainer = document.createElement("div");
-  sentContainer.setAttribute("class", "sent");
-
-  var sentDiv = document.createElement("div");
-  sentDiv.setAttribute("class", "sent-content");
-  sentDiv.innerHTML = message;
-  sentContainer.appendChild(sentDiv);
-
-  var sentImg = document.createElement("img");
-  sentImg.setAttribute("class", "player-chat-img");
-  sentImg.setAttribute("src", "assets/img/kakaotalk-talk.png");
-  sentContainer.appendChild(sentImg);
-
-  container.append(sentContainer);
-}
-
-//hard 스테이지
-//감정 그래프 및 이미지 속도 변화 함수
-function updateGraphMovement(intensity) {
-  // 속도: 빠를수록 애니메이션 duration 짧게
-  let duration;
-  if (intensity >= 0)       duration = 0.4;
-  else if (intensity >= -5) duration = 0.6;
-  else if (intensity >= -10) duration = 0.9;
-  else if (intensity >= -15) duration = 1.4;
-  else if (intensity >= -20) duration = 2.0;
-  else if (intensity >= -25) duration = 3.0;
-  else                      duration = 4.5;
-
-  // 스케일 범위도 변경
-  let scaleMin = 0.4;
-  let scaleMax = 1.8;
-
-  if (intensity >= 0) {
-    scaleMin = 1.0;
-    scaleMax = 2.0;
-  } else if (intensity >= -10) {
-    scaleMin = 0.8;
-    scaleMax = 1.5;
-  } else if (intensity >= -20) {
-    scaleMin = 0.6;
-    scaleMax = 1.2;
-  } else {
-    scaleMin = 0.4;
-    scaleMax = 1.0;
-  }
-
-  const heart = document.getElementById("heart");
-  heart.style.animationDuration = `${duration}s`;
-  heart.style.setProperty('--scale-min', scaleMin);
-  heart.style.setProperty('--scale-max', scaleMax);
-
-  console.log(`[Pulse] intensity: ${intensity}, duration: ${duration}s, scale: ${scaleMin}~${scaleMax}`);
-}
-
-
-/* === C: 스테이지별 게임 규칙 === */
+/* game_난이도 별 블럭 충돌 처리 */
 function onBrickHit(brick) {
   switch (gameState.stage) {
   case "easy":
@@ -897,9 +741,10 @@ function onBrickHit(brick) {
   }
 }
 
-const puzzleState = {
-  board: Array(stageConfig.easy.puzzleCount).fill(null)
-};
+// easy
+function revealPuzzleImage(index) {
+  $(`#slot-${index}`).attr("src", `assets/img/puzzle-${index+1}.png`);
+}
 
 function handleEasyBrick(brick) {
   const conf = stageConfig.easy;
@@ -927,10 +772,57 @@ function handleEasyBrick(brick) {
   }
 }
 
-function getScoreForText(text) {
-  const scores = stageConfig.medium.wordScores;
-  const entry = scores.find(item => item.text === text);
-  return entry ? entry.score : 0;
+//medium
+function sendMessage(message) {
+  for (let i=0; i < gameState.currentIndex; i++) {
+    $(".message").eq(i).animate({bottom: "+=50px"}, 300)
+    console.log(i);
+  }
+  $(".reply").eq(gameState.currentIndex).animate({bottom: "+=50px"}, 300);
+
+  var chatting = document.getElementById("chatting");
+  var container = $(".message").eq(gameState.currentIndex);
+  if (message == "") return;
+
+  var sentContainer = document.createElement("div");
+  sentContainer.setAttribute("class", "sent");
+
+  var sentDiv = document.createElement("div");
+  sentDiv.setAttribute("class", "sent-content");
+  sentDiv.innerHTML = message;
+  sentContainer.appendChild(sentDiv);
+
+  var sentImg = document.createElement("img");
+  sentImg.setAttribute("class", "player-chat-img");
+  sentImg.setAttribute("src", "assets/img/kakaotalk-talk.png");
+  sentContainer.appendChild(sentImg);
+
+  container.append(sentContainer);
+}
+
+function sendQuestion() {
+  setTimeout(() => {
+    $(".message").animate({bottom: "+=50px"}, 300);
+    var chatting = document.getElementById("chatting");
+    var container = document.createElement("div");
+    container.classList.add("message");
+
+    var replyContainer = document.createElement("div");
+    replyContainer.classList.add("reply", "new");
+
+    var replyDiv = document.createElement("div");
+    replyDiv.setAttribute("class", "reply-line");
+    replyDiv.textContent = mediumStageDialogs[gameState.currentIndex].question;
+    replyContainer.appendChild(replyDiv);
+  
+    var replyImg = document.createElement("img");
+    replyImg.setAttribute("class", "reply-chat-img");
+    replyImg.setAttribute("src", "assets/img/kakaotalk-reply.png");
+    replyContainer.appendChild(replyImg);
+
+    container.appendChild(replyContainer);
+    chatting.appendChild(container);
+  }, 1000)
 }
 
 function handleMediumBrick(brick) {
@@ -953,6 +845,7 @@ function handleMediumBrick(brick) {
   }
 }
 
+//hard
 function updateCanvasShake(intensity) {
   const canvas = document.getElementById("gameCanvas");
 
@@ -976,64 +869,139 @@ function updateCanvasShake(intensity) {
   }
 }
 
-function getConfessionNeighbors(index) {
-  const cols = 5;
-  const row = Math.floor(index / cols);
-  const col = index % cols;
+function updateGraphMovement(intensity) {
+  let duration;
 
-  const neighbors = [];
+  if (intensity >= 0)       duration = 0.4;
+  else if (intensity >= -5) duration = 0.6;
+  else if (intensity >= -10) duration = 0.9;
+  else if (intensity >= -15) duration = 1.4;
+  else if (intensity >= -20) duration = 2.0;
+  else if (intensity >= -25) duration = 3.0;
+  else                      duration = 4.5;
 
-  const directions = [
-    [-1, 0], [1, 0], [0, -1], [0, 1],     // 상하좌우
-    [-1, -1], [-1, 1], [1, -1], [1, 1]    // 대각선
-  ];
+  let scaleMin = 0.4;
+  let scaleMax = 1.8;
 
-  for (let [dr, dc] of directions) {
-    const r = row + dr;
-    const c = col + dc;
-    if (r >= 0 && r < 5 && c >= 0 && c < 5) {
-      neighbors.push(r * cols + c);
-    }
+  if (intensity >= 0) {
+    scaleMin = 1.0;
+    scaleMax = 2.0;
+  } else if (intensity >= -10) {
+    scaleMin = 0.8;
+    scaleMax = 1.5;
+  } else if (intensity >= -20) {
+    scaleMin = 0.6;
+    scaleMax = 1.2;
+  } else {
+    scaleMin = 0.4;
+    scaleMax = 1.0;
   }
 
-  return neighbors;
-}
+  const heart = document.getElementById("heart");
+  heart.style.animationDuration = `${duration}s`;
+  heart.style.setProperty('--scale-min', scaleMin);
+  heart.style.setProperty('--scale-max', scaleMax);
 
-// 보호 벽돌 제거 확인 함수
-function areProtectionBricksCleared(confessionIndex) {
-  const neighbors = getConfessionNeighbors(confessionIndex);
-  for (let i of neighbors) {
-    if (bricks[i] && bricks[i].alive) {
-      return false;
-    }
-  }
-  return true;
+  console.log(`[Pulse] intensity: ${intensity}, duration: ${duration}s, scale: ${scaleMin}~${scaleMax}`);
 }
 
 function handleHardBrick(brick) {
   const idx = parseInt(brick.index);
   
   if (brick.isConfession) {
+    score += 200;
+    showScorePopup(200);
     gameStatus = "STAGE_CLEAR";
   } else {
-    // 일반 벽돌 처리
     gameState.intensity--;
     updateCanvasShake(gameState.intensity);
     updateGraphMovement(gameState.intensity);
   }
 }
 
-/* === D: 디자인 및 설정 기능 === */
+/* 관리자 모드*/
+const adminKeys = new Set();
+const requiredKeys = new Set(['s', 'c', 'o', 'r', 'e']);
 
-document.getElementById("settingButton").addEventListener("click", function() {
-  console.log("게임 설정 화면");
-
-  document.getElementById("select-page").style.display = "none";
-  document.getElementById("game-setting").style.display = "block";
+document.getElementById("admin-score-submit").addEventListener("click", () => {
+  const inputVal = parseInt(document.getElementById("admin-score-input").value);
+  if (!isNaN(inputVal)) {
+    score = inputVal;
+    console.log(`관리자 점수로 ${inputVal}점이 설정되었습니다.`);
+    document.getElementById("admin-score-modal").classList.add("hidden");
+  } else {
+    console.log("유효한 숫자를 입력해주세요.");
+  }
 });
 
+/* 키 이벤트 */
+document.addEventListener("keydown", function(e) {
+  const keySetting = settingContainerState.keySetting.current;
+  console.log(keySetting);
 
-/* === 전체 화면 유지 코드 === */
+  adminKeys.add(e.key.toLowerCase());
+
+  if ([...requiredKeys].every(k => adminKeys.has(k))) {
+    document.getElementById("admin-score-modal").classList.remove("hidden");
+  }
+
+  if(event.code == "Tab") {
+    event.preventDefault();
+    
+    let firstStory = document.getElementById("firstStory");
+    let selectPage = document.getElementById("select-page");
+    
+    if(firstStory.style.display == "flex") {
+      console.log("스토리 넘김");
+      firstStory.style.display = "none";
+      selectPage.style.display = "flex";
+    }
+  }
+
+  if (keySetting == 1) {
+    if (e.key == "ArrowLeft") leftPressed = true;
+    if (e.key == "ArrowRight") rightPressed = true;
+  }
+
+  else if (keySetting == 2) {
+    if (e.key == "a" || e.key == "A") leftPressed = true;
+    if (e.key == "d" || e.key == "D") rightPressed = true;
+  }
+});
+
+document.addEventListener("keyup", function(e) {
+  const keySetting = settingContainerState.keySetting.current;
+
+  adminKeys.delete(e.key.toLowerCase());
+
+  if (keySetting == 1) {
+    if (e.key == "ArrowLeft") leftPressed = false;
+    if (e.key == "ArrowRight") rightPressed = false;
+  }
+
+  else if (keySetting === 2) {
+    if (e.key == "a" || e.key == "A") leftPressed = false;
+    if (e.key == "d" || e.key == "D") rightPressed = false;
+  }
+});
+
+/* util_홈으로 이동 */
+function goHome(){
+  document.getElementById("select-page").style.display = "flex";
+  document.getElementById("game-container").style.display = "none";
+  document.getElementById("gameCanvas").style.display = "none";
+  document.getElementById("uiPanel").style.display = "none";
+  document.getElementById("game-setting").style.display = "none";
+
+  gameStatus = "READY";
+  draw.nextStageScheduled = false;
+  ballReadyToMove = false;
+
+  lives = 1;
+  isDead = false;
+}
+
+/* util_전체화면 전환 */
 function isFullScreen() {
   return document.fullscreenElement != null
     || document.webkitFullscreenElement != null
@@ -1054,7 +1022,6 @@ function requestFullScreen() {
   }
 }
 
-// 전체화면 종료 감지
 document.addEventListener("fullscreenchange", () => {
   if (!document.fullscreenElement) {
     const modal = document.getElementById("fullscreen-modal");
@@ -1071,113 +1038,18 @@ document.addEventListener("fullscreenchange", () => {
   }
 });
 
-// 다시 전체화면 버튼
 function reenterFullscreen() {
   requestFullScreen();
   document.getElementById("fullscreen-exit-overlay").style.display = "none";
 }
 
-let timer = null
-
-function loop(){
-  draw();
-  updateScore(score);
-  updateProfile(score);
-  requestAnimationFrame(loop);
-}
-
-document.getElementById("start-btn").addEventListener("click", () => {
-  if (!isFullScreen()) {
-    const modal = document.getElementById("fullscreen-modal");
-    const okBtn = document.getElementById("modal-ok");
-
-    modal.classList.remove("hidden");
-
-    okBtn.onclick = () => {
-      modal.classList.add("hidden");
-      requestFullScreen();
-    };
-
-    return;
-  }
-  loop();
-
-  document.getElementById("initView").style.display = "none";
-  document.getElementById("firstStory").style.display = "flex";
-});
-$("#select-page").find(".stage").eq(0).on("click", function() {
-  mainGame(0);
-});
-$("#select-page").find(".stage").eq(1).on("click", function() {
-  mainGame(1);
-});
-$("#select-page").find(".stage").eq(2).on("click", function() {
-  mainGame(2);
-});
-
-function mainGame(handler){
-  switch(handler){
-  case 0: gameState.stage = "easy"; break;
-  case 1: gameState.stage = "medium"; break;
-  case 2: gameState.stage = "hard"; break;
-  }
-  gameState.isRunning = true;
-  console.log("게임 시작됨. 스테이지:", gameState.stage);
+/* screen_게임 설정 */
+document.getElementById("settingButton").addEventListener("click", function() {
+  console.log("게임 설정 화면");
 
   document.getElementById("select-page").style.display = "none";
-  document.getElementById("game-container").style.display = "flex";
-  document.getElementById("gameCanvas").style.display = "block";
-  document.getElementById("uiPanel").style.display = "block";
-
-  console.log(document.getElementById("gameCanvas").width, document.getElementById("gameCanvas").height);
- 
-  resizeCanvas();
-
-  generateBricks(gameState.stage);
-  applyStageSettings(gameState.stage);
-  ballReadyToMove = false;
-  setTimeout(() => { ballReadyToMove = true; }, 1000);
-
-  updateStageView(gameState.stage);
-
-  if (gameStatus == "GAME_OVER") {
-      updateUI(gameState.stage);
-      generateBricks(gameState.stage);
-      applyStageSettings(gameState.stage);
-      ballX = canvas.width / 2;
-      ballY = canvas.height-200;
-      lives = 1;
-      score = 0;
-      isDead = false;
-      gameStatus = "PLAYING";
-    } else if (gameStatus == "READY") {
-      applyStageSettings(gameState.stage);
-      gameStatus = "PLAYING";
-      isDead = false;
-    } else if (isDead && lives > 0) {
-      ballDX = stageSettings[gameState.stage.toUpperCase()].ballSpeed;
-      ballDY = -ballDX;
-      ballX = canvas.width / 2;
-      ballY = canvas.height-200;
-      isDead = false;
-    }
-};
-
-function goHome(){
-  document.getElementById("select-page").style.display = "flex";
-  document.getElementById("game-container").style.display = "none";
-  document.getElementById("gameCanvas").style.display = "none";
-  document.getElementById("uiPanel").style.display = "none";
-  document.getElementById("game-setting").style.display = "none";
-
-  gameStatus = "READY"; // 추가: draw 중단
-  draw.nextStageScheduled = false;
-  ballReadyToMove = false;
-
-  /*설정 초기화*/
-  lives = 1;
-  isDead = false;
-}
+  document.getElementById("game-setting").style.display = "block";
+});
 
 const settingContainerState = {
   bgThema: { current: 1, max: 4, prefix: 'bgthema' },
@@ -1257,9 +1129,122 @@ function musicControl(cid, cur) {
   }
 }
 
+/* screen_난이도 선택 */
+$("#select-page").find(".stage").eq(0).on("click", function() {
+  mainGame(0);
+});
+$("#select-page").find(".stage").eq(1).on("click", function() {
+  mainGame(1);
+});
+$("#select-page").find(".stage").eq(2).on("click", function() {
+  mainGame(2);
+});
+
+function mainGame(handler){
+  switch(handler){
+  case 0: gameState.stage = "easy"; break;
+  case 1: gameState.stage = "medium"; break;
+  case 2: gameState.stage = "hard"; break;
+  }
+  gameState.isRunning = true;
+  console.log("게임 시작됨. 스테이지:", gameState.stage);
+
+  document.getElementById("select-page").style.display = "none";
+  document.getElementById("game-container").style.display = "flex";
+  document.getElementById("gameCanvas").style.display = "block";
+  document.getElementById("uiPanel").style.display = "block";
+
+  console.log(document.getElementById("gameCanvas").width, document.getElementById("gameCanvas").height);
+ 
+  resizeCanvas();
+
+  generateBricks(gameState.stage);
+  applyStageSettings(gameState.stage);
+  ballReadyToMove = false;
+  setTimeout(() => { ballReadyToMove = true; }, 1000);
+
+  updateStageView(gameState.stage);
+
+  if (gameStatus == "GAME_OVER") {
+      updateUI(gameState.stage);
+      generateBricks(gameState.stage);
+      applyStageSettings(gameState.stage);
+      ballX = canvas.width / 2;
+      ballY = canvas.height-200;
+      lives = 1;
+      score = 0;
+      isDead = false;
+      gameStatus = "PLAYING";
+    } else if (gameStatus == "READY") {
+      applyStageSettings(gameState.stage);
+      gameStatus = "PLAYING";
+      isDead = false;
+    } else if (isDead && lives > 0) {
+      ballDX = stageSettings[gameState.stage.toUpperCase()].ballSpeed;
+      ballDY = -ballDX;
+      ballX = canvas.width / 2;
+      ballY = canvas.height-200;
+      isDead = false;
+    }
+};
+
+/* screen_게임시작 */
+let timer = null
+
+function loop(){
+  draw();
+  updateScore(score);
+  updateProfile(score);
+  requestAnimationFrame(loop);
+}
+
+document.getElementById("start-btn").addEventListener("click", () => {
+  if (!isFullScreen()) {
+    const modal = document.getElementById("fullscreen-modal");
+    const okBtn = document.getElementById("modal-ok");
+
+    modal.classList.remove("hidden");
+
+    okBtn.onclick = () => {
+      modal.classList.add("hidden");
+      requestFullScreen();
+    };
+
+    return;
+  }
+  loop();
+
+  document.getElementById("initView").style.display = "none";
+  document.getElementById("firstStory").style.display = "flex";
+});
+
+/* screen_튜토리얼 */
 document.body.addEventListener("click", (e) => {
   if (e.target.classList.contains("reload")) {
     location.reload();
   }
+});
+
+let tutorialIndex = 0;
+const slides = document.querySelectorAll(".tutorial-slide");
+
+function showSlide(index) {
+  slides.forEach((slide, i) => {
+    slide.classList.toggle("active", i === index);
+  });
+}
+
+function nextTutorial() {
+  tutorialIndex = (tutorialIndex + 1) % slides.length;
+  showSlide(tutorialIndex);
+}
+
+function prevTutorial() {
+  tutorialIndex = (tutorialIndex - 1 + slides.length) % slides.length;
+  showSlide(tutorialIndex);
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+  showSlide(tutorialIndex);
 });
 

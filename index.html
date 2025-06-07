@@ -18,6 +18,14 @@
 <body>
   <audio id = "bgm" src="assets/audio/bgm1.mp3" autoplay loop muted></audio>
 
+  <div id="admin-score-modal" class="hidden">
+    <div class="admin-score-box">
+      <h3>관리자 점수 설정</h3>
+      <input id="admin-score-input" type="number" placeholder="예: 100" />
+      <button id="admin-score-submit">적용</button>
+    </div>
+  </div>
+
   <div id="fullscreen-exit-overlay">
     <div>전체화면이 종료되었습니다.</div>
     <button onclick="reenterFullscreen()">다시 전체화면으로 전환</button>
@@ -88,12 +96,67 @@
  </div>
 
   <div id="firstStory">
-    <p>story</p>
-    <!-- 초기 스토리 -->
+    <div id="intro">
+      <h1 style="color: #b03a5b;">💌 GAME STORY 💌</h1>
+      <p>당신은 짝사랑을 하던 그때 그 순간으로 왔습니다.</p>
+      <p class="highlight">짝사랑을 하는 당신은 처음에는 그 사람과의 순간을 회상하고</p>
+      <p class="highlight">용기를 내어 그 사람에게 연락도 하며</p>
+      <p class="highlight">넘치는 마음에 고백도 하게 될 것입니다.</p>
+      <p>꼭 당신의 사랑과 이루어지길 바랍니다.</p>
+      <p class="last">다만, 당신의 사랑과 좋은 결실을 맺기 위해선 벽돌깨기를 잘 해야 할 것 입니다.</p>
+    </div>
+
+    <div id="tutorial">
+      <h2>🎮 튜토리얼 🎮</h2>
+      <div class="arrow left" onclick="prevTutorial()">⬅️</div>
+
+      <div class="tutorial-slide active" id="tutorial-basic">
+        <h3>기본 조작</h3>
+        <p>이 게임은 방향키 또는 wasd 키로 패들을 조작합니다.</p>
+        <p>패들을 움직이며 공을 이용해 벽돌을 깰 수 있습니다.</p>
+      </div>
+
+      <div class="tutorial-slide" id="tutorial-character">
+        <h3>캐릭터 진화</h3>
+        <div class="character-row">
+          <img src="assets/img/char_1.png" alt="캐릭터1" class="character-img">
+          <img src="assets/img/char_2.png" alt="캐릭터2" class="character-img">
+          <img src="assets/img/char_3.png" alt="캐릭터3" class="character-img">
+        </div>
+        <p>캐릭터는 하얀이 ⇀ 말랑이 ⇀ 사랑이 로 진화합니다.</p>
+        <p>각 스테이지를 차례대로 성공하여</p>
+        <p>캐릭터를 성장시키세요!</p>
+      </div>
+
+      <div class="tutorial-slide" id="tutorial-easy">
+        <h3>🌸 EASY – 생각만 해도 설레는</h3>
+        <img src="assets/img/tutorial-easy.png" alt="Easy Tutorial" class="tutorial-img">
+        <p>벽돌을 깨면서 첫 만남의 기억 퍼즐을 완성해야 합니다.</p>
+        <p>퍼즐을 완성시켜 연락 단계로 넘어가세요!</p>
+      </div>
+
+      <div class="tutorial-slide" id="tutorial-medium">
+        <h3>💌 MEDIUM – 용기 내어 말을 건네다</h3>
+        <img src="assets/img/tutorial-medium.png" alt="Medium Tutorial" class="tutorial-img">
+        <p>상대에게 연락이 오고,</p>
+        <p>대답 벽돌을 깨서 답장해야 합니다.</p>
+        <p>나쁨, 애매, 좋음 단계의 답장 벽돌이 존재합니다.</p>
+        <p>좋은 답장을 해 호감도를 높여 고백 단계로 넘어가세요!</p>
+      </div>
+
+      <div class="tutorial-slide" id="tutorial-hard">
+        <h3>🧠 HARD – 고백, 마음을 전하는 날</h3>
+        <img src="assets/img/tutorial-hard.png" alt="Hard Tutorial" class="tutorial-img">
+        <p>벽돌 사이에 붉은 고백 벽돌이 존재합니다.</p>
+        <p>고백 벽돌을 맞춰 고백하세요!</p>
+        <p>다만, 이른 고백은 나쁜 결과를 불러옵니다.</p>
+      </div>
+
+      <div class="arrow right" onclick="nextTutorial()">➡️</div>
+    </div>
   </div>
 
   <div id="select-page">
-    <!-- 난이도 선택 버튼, 게임 설정 버튼 페이지 -->
     <div id="profileBoxFancy">
       <div class="profile-img-container">
         <img id="profileImgFancy" src="assets/img/char_1.png" alt="char" />
@@ -120,7 +183,6 @@
      </div>
   </div>
 
-  <!-- 결과별 엔딩 페이지 -->
   <div id="ending-page">
     <div id="happy-ending">
       <p>안녕? 무슨 말부터 해야 할지...//</p>
@@ -145,12 +207,9 @@
   <div id="score-popup-negative">-50</div>
 
   <div id="game-container">
-    <!-- === A: Canvas 영역 === -->
     <canvas id="gameCanvas" width="800" height="600"></canvas>
 
-    <!-- === B: 우측 UI 패널 === -->
     <div id="uiPanel">
-      <!-- === B: UI 콘텐츠 (퍼즐판, 채팅창, 그래프 등) === -->
       <div id="uiContent">
         <div id="scorePanel">
           <div id="scoreInfo">호감도: <span id="scoreValue">0</span></div>
@@ -158,7 +217,6 @@
         </div>
 
         <div id="puzzle-board">
-          <!-- 퍼즐 테두리 색상, 진행도 시각화 구현 예정 -->
           <img id="slot-0" class="slot" src="assets/img/gray.png" alt="">
           <img id="slot-1" class="slot" src="assets/img/gray.png" alt="">
           <img id="slot-2" class="slot" src="assets/img/gray.png" alt="">
@@ -183,17 +241,14 @@
         <div id="emotion-graph">
           <div id="heart-wrapper">
             <img id="heart" src="assets\img\heart.png">
-            <!-- 고백 벽돌 설명용 Floating 안내창 -->
           </div>
           <div id="confession-guide-popup">
             벽돌을 깨면 감정이 <span class="highlight">안정</span>돼요!<br>
             <span class="highlight">고백 벽돌(빨간색)</span>을 깨면 <strong>게임 종료!!</strong>
           </div>
         </div>
-
       </div>
 
-      <!-- === B: 완료 메시지 === -->
       <div id="endMessage" class="hidden">기억 완성!</div>
     </div>
   </div>

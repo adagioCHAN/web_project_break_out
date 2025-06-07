@@ -9,7 +9,6 @@ html, body {
   padding: 0;
   height: 100%;
   background: linear-gradient(to bottom, #FFE4F0, white);
-
   display: flex;
   justify-content: center;
   align-items: center;
@@ -22,14 +21,12 @@ html, body {
   align-items: center;
 }
 
-/* === A: 캔버스 영역 - 좌측 (60%) === */
 #gameCanvas {
   display: none;
   background-color: white;
   flex-shrink: 0;
 }
 
-/* === B: UI 패널 - 우측 (40%) === */
 #uiPanel {
   display: none;
   height: 100%;
@@ -202,23 +199,20 @@ html, body {
   transform-origin: center center;
   animation-name: pulse;
   animation-iteration-count: infinite;
-  animation-duration: 3s; /* JS에서 조정됨 */
+  animation-duration: 3s;
 }
 
-/* pulse 애니메이션은 scale 범위가 JS에서 변경됨 (via CSS 변수) */
 @keyframes pulse {
   0%   { transform: scale(var(--scale-min, 0.6)); }
   50%  { transform: scale(var(--scale-max, 1.3)); }
   100% { transform: scale(1); }
 }
 
-/* 채팅 메시지 테스트용입니다. 디자인 완료 시 지워주세요 */
 .chat-line-user {
- position: relative;
+  position: relative;
   z-index: 10; 
 }
 
-/* === C: hard 모드 canvas 흔들림 효과 ===*/
 @keyframes canvasShake {
   0%   { transform: translate(0, 0); }
   20%  { transform: translate(var(--shake-x, 2px), var(--shake-y, 2px)); }
@@ -232,26 +226,20 @@ canvas.shaky {
   animation: canvasShake 0.3s infinite;
 }
 
-/* === D: 버튼 및 사용자 설정 === */
 #settingButton {
   width: 400px;
   height: auto;
   max-width: 100%;
   padding: 10px;
   object-fit: contain;
-  /* background-color: #3b82f6; */
-  /* color: #fff; */
-  /* border: 1px solid black; */
   cursor: pointer;
 }
 
 #settingButton:hover{
   background-color: #002d71;
-  /* color: #3b82f6; */
 }
 #settingButton:hover{
    background-color: #002d71;
-  /* color: #3b82f6; */
 }
 
 #firstStory {
@@ -812,7 +800,6 @@ canvas.shaky {
   overflow-y: auto;
 }
 
-/* 공통 스타일 */
 #happy-ending,
 #sad-ending {
   display: none;
@@ -824,7 +811,6 @@ canvas.shaky {
   animation: fadeInFancy 1s ease-out forwards;
 }
 
-/* 텍스트 하나씩 등장 */
 #ending-page p {
   opacity: 0;
   animation: fadeInFancy 0.8s ease-out forwards;
@@ -853,7 +839,6 @@ canvas.shaky {
   text-shadow: 0 0 8px rgba(80, 120, 180, 0.2);
 }
 
-/* 애니메이션 */
 @keyframes fadeInFancy {
   0% {
     opacity: 0;
@@ -878,7 +863,7 @@ canvas.shaky {
   left: 0;
   width: 100%;
   height: 100vh;
-  pointer-events: none; /* 클릭 방지 */
+  pointer-events: none;
   z-index: 20;
 }
 
@@ -1042,5 +1027,173 @@ canvas.shaky {
   transform: scale(1.03);
 }
 
+#admin-score-modal {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: #fff0f5;
+  border: 2px solid #ffb6c1;
+  border-radius: 18px;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+  padding: 24px 32px;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
 
+#admin-score-modal.hidden {
+  display: none;
+}
+
+#admin-score-modal h3 {
+  font-family: 'Gamja Flower', cursive;
+  color: #d83c7d;
+  font-size: 24px;
+  margin-bottom: 12px;
+}
+
+#admin-score-input {
+  padding: 10px;
+  font-size: 16px;
+  width: 120px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  text-align: center;
+  margin-bottom: 10px;
+}
+
+#admin-score-submit {
+  padding: 8px 16px;
+  font-size: 16px;
+  background-color: #ff85b3;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+#firstStory {
+  display: none;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  gap: 40px;
+  padding: 40px;
+  width: 100vw;
+  height: 100vh;
+  box-sizing: border-box;
+  font-family: 'Gowun Batang', serif;
+}
+
+#intro {
+  background-color: white;
+  border-radius: 24px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+  padding: 30px;
+  font-size: 20px;
+  font-weight: bold;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  align-items: center;
+  justify-content: center;
+
+  width: 60vw;
+  height: 80vh;
+}
+
+/* 강조 색 */
+.highlight {
+  color: #b03a5b;
+}
+
+/* 마지막 문장 강조 */
+.last {
+  font-size: 22px;
+  font-weight: bold;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+
+#tutorial {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+
+  background-color: white;
+  border-radius: 24px;
+  padding: 30px;
+  font-size: 18px;
+  overflow: hidden;
+  width: 35vw;
+  height: 80vh;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+  font-weight: bold;
+}
+
+#tutorial h3{
+  color: #b03a5b;
+}
+
+#tutorial h2,h3 {
+  margin-bottom: 20px;
+  font-family: 'Gowun Batang', serif;
+}
+
+.tutorial-slide {
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 10px;
+}
+
+.tutorial-slide.active {
+  display: flex;
+}
+
+.character-row {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 16px;
+  margin: 12px 0;
+}
+
+.character-img {
+  width: 100px;
+  height: auto;
+  border-radius: 12px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+}
+
+.tutorial-img {
+  width: 100%;
+  max-width: 400px;
+  height: auto;
+  border-radius: 16px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+.arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 32px;
+  cursor: pointer;
+  user-select: none;
+  z-index: 2;
+}
+
+.arrow.left {
+  left: 10px;
+}
+
+.arrow.right {
+  right: 10px;
+}
 
